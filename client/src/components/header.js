@@ -82,7 +82,7 @@ function HeaderFixedTools (props) {
 function HeaderFixedSignup (props) {
     return (
         <div className='header-fixed-signup-login flex-row-even'>
-            <button className='header-fixed-signup pointer' onClick={() => props.openInSmallIFrame('./login')}>LOG IN</button>
+            <button className='header-fixed-signup pointer' onClick={() => props.openInSmallIFrame('/login')}>LOG IN</button>
             <button className='header-fixed-login pointer'>SIGN UP</button>
         </div>
     )
@@ -123,7 +123,7 @@ class HeaderFixedUser extends React.Component{
                 </button>
                 <div
                     className={this.state.dropdown ? 'header-fixed-user-dropdown-active' : 'header-fixed-user-dropdown-inactive'}>
-                    <div className='header-fixed-user-dropdown-active-item' onClick={() => this.props.openInSmallIFrame('./login')}>
+                    <div className='header-fixed-user-dropdown-active-item' onClick={() => this.props.openInSmallIFrame('/login')}>
                         <span>Log in / Sign up</span>
                     </div>
                 </div>
