@@ -1,0 +1,59 @@
+.frontpage-wrapper {
+    width: 100%;
+    min-height: 2000px;
+    background-color: rgb(219, 224, 229);
+}
+
+.main-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+}
+.main-content-wrapper-box {
+    width: 1000px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: flex-start;
+}
+.posts-wrapper {
+    width: 660px;
+    height: auto;
+}
+.infos-wrapper {
+    width: 300px;
+    height: auto;
+}
+
+
+
+.iframe-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.iframe-close-icon {
+    position: absolute;
+    top: calc(50% - 260px);
+    right: calc(50% - 360px);
+    color: grey;
+}
+.iframe-close-icon:hover {
+    color: red;
+}
+.iframe-wrapper iframe{
+    width: 800px;
+    height: 600px;
+    border: none;
+    box-shadow: 0 0 20px 0px rgb(0, 0, 0);
+}

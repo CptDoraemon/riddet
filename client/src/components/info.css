@@ -1,0 +1,120 @@
+.info-wrapper {
+    background-color: white;
+    width: 300px;
+    min-height: 200px;
+    margin: 20px 0 20px 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+.info-header {
+    width: calc(100% - 20px);
+    padding: 0 10px;
+    height: 30px;
+    line-height: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.info-header h5 {
+    font-size: 0.7em;
+}
+.info-body {
+    width: calc(100% - 20px);
+    padding: 0 10px 10px 10px;
+}
+.info-banner {
+    width: 100%;
+    height: 40px;
+    padding: 5px 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.info-banner span {
+    padding: 0 10px;
+}
+.info-stats {
+    width: 100%;
+    height: auto;
+    padding: 5px 0;
+}
+.info-stat {
+    width: 50%;
+}
+.info-stat h5{
+    text-transform: capitalize;
+}
+.info-stat p{
+    font-size: 1em;
+}
+.info-message {
+    padding: 5px 0;
+}
+
+.info-message p {
+    font-size: 0.8em;
+    line-height: 1.5em;
+}
+.info-button {
+    width: 100%;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 10px 0;
+    margin: 5px 0;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+.info-button:hover {
+    opacity: 0.8;
+}
+.info-officer {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.8em;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+.info-officer-name {
+    width: fit-content;
+    padding: 0 5px;
+}
+.info-officer-signature {
+    width: fit-content;
+    background-color: rgb(200, 200, 200);
+    color: white;
+    padding: 0 5px;
+    line-height: 20px;
+    font-weight: bold;
+}
+.info-about {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.info-about p {
+    width: calc(100% - 40px);
+    font-weight: bold;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 10px 0;
+}
+.info-about a {
+    width: calc(100% - 40px);
+    font-weight: bold;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 10px 0;
+}
+.info-about-fixed {
+    position: fixed;
+    top: 40px; /* wrapper has 20px margin */
+}

@@ -1,0 +1,119 @@
+.card-wrapper {
+    width: 660px;
+    min-height: 200px;
+    height: auto;
+    margin: 20px 20px 20px 0;
+    border-radius: 5px;
+    border: solid 2px rgb(200, 200, 200);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+    background-color: rgb(240, 240, 240);
+}
+.card-wrapper:hover {
+    border: solid 2px rgb(100, 100, 100);
+}
+.card-sidebar {
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.card-sidebar-voteup {
+    color: grey;
+    cursor: pointer;
+    padding-top: 20px;
+}
+.card-sidebar-voteup:hover {
+    color: red;
+}
+.card-sidebar-votedown {
+    color: grey;
+    cursor: pointer;
+}
+.card-sidebar-votedown:hover {
+    color: blue;
+}
+.card-sidebar-count {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 0 5px 0;
+    width: 100%;
+    text-align: center;
+}
+.card-body {
+    width: calc(100% - 40px);
+    height: 100%;
+    position: relative;
+    background-color: white;
+}
+/* body: max-hight: 600; info: 20; content: 500+5*2; placeholder: 60 */
+.card-body-info {
+    color: grey;
+    padding: 0 5px;
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+}
+.card-body-content {
+    margin: 5px;
+    max-height: 500px;
+    overflow: hidden;
+}
+.card-body-content-unfold {
+    max-height: none !important;
+}
+.card-body-content h3 {
+    font-size: 20px;
+}
+.card-body-content p {
+    line-height: 1.5em;
+    font-size: 16px;
+    padding-top: 8px;
+}
+.card-body-content-maxheight-placeholder {
+    height: 10px;
+    width: 100%;
+    font-size: 10px;
+    line-height: 10px;
+    text-align: center;
+    margin: 10px 0 40px 0;
+    font-style: italic
+}
+.card-body-content-maxheight-placeholder span {
+    cursor: pointer;
+}
+.card-body-bottombar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    height: 30px;
+    color: grey;
+}
+.card-body-bottombar-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    height: 30px;
+    cursor: pointer;
+}
+.card-body-bottombar-item:hover {
+    background-color: rgb(220, 220, 220);
+}
+.card-body-bottombar-item span {
+    padding: 0 3px;
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 14px;
+    line-height: 30px;
+    height: 30px;
+}

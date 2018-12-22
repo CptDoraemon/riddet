@@ -1,0 +1,314 @@
+.pointer {
+    cursor: pointer;
+}
+.flex-row-even {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around; /* stupid ie */
+}
+.flex-row-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.flex-column-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.header-wrapper {
+    width: 100%;
+}
+.header-fixed {
+    width: 100%;
+    height: 50px;
+    background-color: white;
+    position: fixed;
+    z-index: 99;
+    font-weight: bold;
+}
+.header-fixed-logo {
+    width: 100px;
+    color: rgb(54, 121, 204);
+}
+.header-fixed-logo span {
+    font-size: 1.5em;
+    height: 35px;
+    line-height: 35px;
+}
+.header-fixed-subs {
+    width: 250px;
+    height: 35px;
+    background-color: white;
+}
+.header-fixed-subs-icon {
+    width: 40px;
+    height: 100%;
+}
+.header-fixed-subs span {
+    height: 35px;
+    line-height: 35px;
+    text-align: left;
+    width: 210px;
+    font-size: 1em;
+}
+.header-fixed-search {
+    width: calc(100vw - 950px);
+    background-color: rgb(240, 240, 240);
+    color: grey;
+    border-radius: 5px;
+    height: 35px;
+    border: solid 1px rgb(200, 200, 200);
+}
+.header-fixed-search input{
+    padding: 0;
+    margin: 0;
+    border: 0;
+    height: 100%;
+    width: calc(100vw - 1000px);
+    font-size: 1em;
+    background-color: inherit;
+    color: inherit;
+    outline: none;
+}
+.header-fixed-search:hover, .header-fixed-search:focus {
+    background-color: white;
+    border: solid 1px rgb(100, 100, 100);
+}
+.header-fixed-tools {
+    display: flex;
+    width: 100px;
+    height: 35px;
+}
+.header-fixed-signup-login {
+    width: 300px;
+}
+.header-fixed-signup {
+    width: 130px;
+    height: 35px;
+    color: rgb(54, 121, 204);
+    background-color: white;
+    border: solid 1px rgb(54, 121, 204);
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+.header-fixed-login {
+    width: 130px;
+    height: 35px;
+    color: white;
+    background-color: rgb(54, 121, 204);
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+.header-fixed-signup:hover, .header-fixed-login:hover {
+    opacity: 0.8;
+}
+.header-fixed-user {
+    position: relative;
+}
+.header-fixed-user-button {
+    height: 35px;
+    width: 80px;
+    border-radius: 10px;
+    border: solid 1px rgb(255, 255, 255);
+    color: grey;
+    background-color: white;
+}
+.header-fixed-user-button:hover {
+    border: solid 1px rgb(240, 240, 240);
+}
+.header-fixed-user-dropdown-active {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    width: 200px;
+    height: auto;
+    background-color: white;
+    border: solid 1px rgb(230, 230, 230);
+    border-radius: 5px;
+    transition: top 0.3s ease;
+    box-shadow: 0 2px 10px 0 rgb(150, 150, 150);
+    overflow: hidden;
+}
+.header-fixed-user-dropdown-active-item {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    font-weight: bold;
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+}
+.header-fixed-user-dropdown-active-item:hover {
+    background-color: rgb(54, 121, 204);
+    color: white;
+}
+.header-fixed-user-dropdown-inactive {
+    display: none;
+}
+
+/* sum width except search = 830px */
+
+.header-fixed-placeholder {
+    position: relative;
+    z-index: -1;
+    height: 50px;
+}
+
+.banner1 {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+.banner1-container {
+    width: 1200px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.banner1-logo {
+    height: 30px;
+    width: 30px;
+    color: black;
+    background-color: white;
+    border-radius: 100%;
+    border: solid 3px white;
+}
+.banner1-title {
+    height: 30px;
+    width: fit-content;
+    padding: 0 10px;
+    line-height: 30px;
+    font-size: 1.5em;
+    text-align: center;
+    color: white;
+}
+
+.banner2 {
+    position: relative;
+    width: 100%;
+    height: 40px;
+}
+.banner2-container {
+    width: 1200px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.banner2-item {
+    width: fit-content;
+    height: 34px;
+    padding: 0 10px;
+    line-height: 34px;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: solid 3px;
+}
+
+.banner3 {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    background-color: white;
+    color: grey;
+}
+.banner3-container {
+    width: 1000px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.banner3-view {
+    width: 130px;
+}
+.banner3-view span {
+    font-size: 0.5em;
+    font-weight: bold;
+}
+.banner3-view-item {
+    width: 25px;
+    height: 25px;
+    position: relative;
+}
+.banner3-view-item-toolkit {
+    position: absolute;
+    left: 0;
+    top: -100%;
+    width: fit-content;
+    padding: 0 10px;
+    height: 25px;
+    line-height: 25px;
+    color: white !important;
+    background-color: black;
+    font-size: 0.8em !important;
+    font-weight: normal !important;
+    text-align: center;
+    border-radius: 5px;
+    z-index: 99;
+    display: none;
+}
+.banner3-view-item-toolkit::before {
+    content:'';
+    position:absolute;
+    width: 15px;
+    height: 15px;
+    transform:rotate(45deg);
+    bottom: 0;
+    left: 5px;
+    background-color: black;
+    z-index: -1;
+    text-transform: capitalize;
+}
+.banner3-view-item:hover .banner3-view-item-toolkit {
+    display: block;
+}
+.banner3-sort {
+    width: auto;
+    font-weight: bold;
+    font-size: 0.5em;
+    position: relative;
+}
+.banner3-sort span {
+    padding: 0 5px;
+    width: fit-content;
+    color: inherit;
+}
+.banner3-sort-item {
+    font-size: 1.8em;
+    color:inherit;
+    width: fit-content;
+    height: 100%;
+    text-transform: uppercase;
+}
+
+.banner3-sort-dropdown-active {
+    position: absolute;
+    top: calc(100% + 20px);
+    background-color: white;
+    border-top: solid 1px rgb(230, 230, 230);
+    border-left: solid 1px rgb(230, 230, 230);
+    border-right: solid 1px rgb(230, 230, 230);
+    border-radius: 5px;
+    transition: top 0.3s ease;
+    box-shadow: 0 2px 10px 0 rgb(150, 150, 150);
+    z-index: 2;
+}
+.banner3-sort-dropdown-item {
+    border-bottom: solid 1px rgb(230, 230, 230);
+    width: 120px;
+    padding: 10px;
+}
+.banner3-sort-dropdown-inactive {
+    position: absolute;
+    top: 100%;
+    visibility: hidden;
+}
