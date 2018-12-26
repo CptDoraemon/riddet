@@ -45,7 +45,9 @@ class Frontpage extends React.Component {
     openInSmallIFrame(link) {
         this.setState({
             smallIFrame: link
-        })
+        });
+
+        link === '' ? document.body.style.overflow = 'auto' : document.body.style.overflow = 'hidden';
     }
     render() {
         return (

@@ -1,22 +1,16 @@
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
 const mongoose = require ("mongoose");
+const mongo = require('mongodb').MongoClient;
+const path = require('path');
 const helmet = require('helmet');
 const session = require('express-session');
-const passport = require('passport');
+const routes = require('./routes.js');
+const auth = require('./auth.js');
+
 const app = express();
 
 
-const uristring = process.env.MONGODB_URI;
-//|| 'mongodb://test:abcd1234@ds125684.mlab.com:25684/freecodecamp';
-let feedbackSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    message: String,
-    date: Date
-});
-let Feedback = mongoose.model('Feedback', feedbackSchema);
+const uristring = process.env.MONGODB_URI || 'mongodb://test:abcd1234@ds125684.mlab.com:25684/freecodecamp';
 
 // if( process.env.PORT ) {
 //     app.use((req, res, next) => {
@@ -28,31 +22,23 @@ let Feedback = mongoose.model('Feedback', feedbackSchema);
 
 app.use(helmet());
 app.use(express.static(path.join(__dirname, 'client/build')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: true,
-//     saveUninitialized: true,
-// }));
-// app.use(passport.initialize());
-// app.use(passport.session());
+mongo.connect(uristring, (err, client) => {
+    let db = client.db('freecodecamp');
 
+    if(err) {
+        console.log('Database error: ' + err);
+    } else {
+        console.log('Successful database connection');
 
+        auth(app, db);
 
+        routes(app, db);
 
-
-
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname+'/client/build/index.html'));
+        const port = process.env.PORT || 5000;
+        app.listen(port);
+    }
 });
 
 
-const port = process.env.PORT || 5000;
-app.listen(port);
+

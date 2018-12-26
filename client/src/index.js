@@ -10,7 +10,8 @@ import ScrollToTop from './components/scrolltotop';
 import { IoIosBonfire } from "react-icons/io";
 
 import { Frontpage } from './components/frontpage';
-import { Login } from './components/login';
+import { Login } from './components/forms/login';
+import { Signup } from './components/forms/signup';
 
 
 
@@ -32,6 +33,7 @@ class Index extends React.Component {
                     <Switch>
                         <Route path="/" exact render={(props) => <Frontpage {...props} themeColor={themeColor} themeLogo={themeLogo} themeTitle={themeTitle}/>} />
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
+                        <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                     </Switch>
                 </ScrollToTop>
             </Router>

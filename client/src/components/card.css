@@ -50,13 +50,13 @@
     position: relative;
     background-color: white;
 }
-/* body: max-hight: 600; info: 20; content: 500+5*2; placeholder: 60 */
+/* body: max-hight: 600; info: 25; content: 500+5*2; placeholder: 60 */
 .card-body-info {
     color: grey;
-    padding: 0 5px;
+    padding: 5px 5px 0 5px;
     font-size: 12px;
-    height: 20px;
-    line-height: 20px;
+    height: 15px;
+    line-height: 15px;
 }
 .card-body-content {
     margin: 5px;

@@ -82,8 +82,8 @@ function HeaderFixedTools (props) {
 function HeaderFixedSignup (props) {
     return (
         <div className='header-fixed-signup-login flex-row-even'>
-            <button className='header-fixed-signup pointer' onClick={() => props.openInSmallIFrame('/login')}>LOG IN</button>
-            <button className='header-fixed-login pointer'>SIGN UP</button>
+            <button className='header-fixed-login pointer' onClick={() => props.openInSmallIFrame('/login')}>LOG IN</button>
+            <button className='header-fixed-signup pointer' onClick={() => props.openInSmallIFrame('/signup')}>SIGN UP</button>
         </div>
     )
 }
