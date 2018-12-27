@@ -28,7 +28,16 @@ class FormItem extends React.Component {
         return (
             <div className='form-item-wrapper'>
                 <span className={!this.state.hover && !this.state.focus && this.props.value === '' ? 'form-item-wrapper-label' : 'form-item-wrapper-label-small'}>{ this.props.label }</span>
-                <input onMouseOver={this.toggleHover} onMouseLeave={this.toggleHover} onFocus={this.toggleFocus} onBlur={this.toggleFocus} onChange={(e) => this.props.handler(e)} value={this.props.value} type={this.props.type || 'text'}/>
+                <input
+                    onMouseOver={this.toggleHover}
+                    onMouseLeave={this.toggleHover}
+                    onFocus={this.toggleFocus}
+                    onBlur={this.toggleFocus}
+                    onChange={(e) => this.props.handler(e)}
+                    value={this.props.value}
+                    type={this.props.type || 'text'}
+                    disabled={this.props.disabled || false}
+                    style={this.props.style || null} />
             </div>
         )
     }

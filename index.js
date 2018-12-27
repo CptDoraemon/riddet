@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require ("mongoose");
 const mongo = require('mongodb').MongoClient;
 const path = require('path');
 const helmet = require('helmet');
@@ -23,7 +22,7 @@ const uristring = process.env.MONGODB_URI || 'mongodb://test:abcd1234@ds125684.m
 app.use(helmet());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-mongo.connect(uristring, (err, client) => {
+mongo.connect(uristring, { useNewUrlParser: true }, (err, client) => {
     let db = client.db('freecodecamp');
 
     if(err) {
