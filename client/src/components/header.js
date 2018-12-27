@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import './header.css';
 
 import { IoIosAnalytics, IoIosSearch, IoIosTrendingUp, IoIosStats, IoIosCube, IoMdPerson, IoMdArrowDropdown } from "react-icons/io";
@@ -108,6 +108,17 @@ class HeaderFixedUser extends React.Component{
             dropdown: false
         })
     }
+    logout() {
+        fetch('/logout', {
+            method: 'GET'
+        }).then(res => res.json())
+            .then(json => {
+                if (json === '120') {
+                    window.location.reload();
+                }
+            })
+            .catch((err) => console.log(err));
+    }
     dropdownList() {
         if (!this.props.isLogin) {
             return (
@@ -122,9 +133,7 @@ class HeaderFixedUser extends React.Component{
                         <span>Settings</span>
                     </div>
                     <div className='header-fixed-user-dropdown-active-item'>
-                        <Link to='/logout'>
-                            <span>Log out</span>
-                        </Link>
+                        <span onClick={this.logout}>Log out</span>
                     </div>
                 </React.Fragment>
             )
@@ -142,6 +151,7 @@ class HeaderFixedUser extends React.Component{
             <div className='header-fixed-user'>
                 <button className='header-fixed-user-button flex-row-even pointer' onClick={this.toggleDropdown}>
                     <IoMdPerson size='25px'/>
+                    <span className='header-fixed-user-button-username'> {this.props.user.username} </span>
                     <IoMdArrowDropdown size='25px'/>
                 </button>
                 <div
@@ -165,7 +175,7 @@ class HeaderFixed extends React.Component {
                     <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
                     <HeaderFixedTools />
                     { signup }
-                    <HeaderFixedUser openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin}/>
+                    <HeaderFixedUser openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
             </div>
         );
     }
@@ -319,7 +329,7 @@ class Header extends React.Component {
     render() {
         return (
             <div className='header-wrapper'>
-                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin}/>
+                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
                 <HeaderFixedPlaceholder />
                 <Banner1 themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                 <Banner2 themeColor={this.props.themeColor}/>

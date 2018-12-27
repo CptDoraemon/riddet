@@ -22,6 +22,7 @@ module.exports = function (app, db) {
     // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed
+    // 120 logout success
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -121,12 +122,12 @@ module.exports = function (app, db) {
     );
 
     app.get('/verifyAuthentication', (req, res) => {
-        req.isAuthenticated() ? res.json('110') : res.json('111');
+        req.isAuthenticated() ? res.json({code: '110', username: req.user.username}) : res.json({code: '111'});
     });
 
     app.get('/logout', (req, res) => {
         req.logout();
-        res.redirect('/');
+        res.json('120');
     });
 
 

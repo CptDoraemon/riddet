@@ -27,7 +27,10 @@ class Frontpage extends React.Component {
             view: 'card',
             sort: 'hot',
             smallIFrame: '',
-            isLogin: false
+            isLogin: false,
+            user : {
+                username: null,
+            }
         };
         this.toggleView = this.toggleView.bind(this);
         this.toggleSort = this.toggleSort.bind(this);
@@ -74,8 +77,8 @@ class Frontpage extends React.Component {
             }}
         ).then(res => res.json())
             .then(json => {
-                if (json === '110') this.setState({isLogin: true});
-                if (json === '111') this.setState({isLogin: false});
+                if (json.code === '110') this.setState({ isLogin: true, user: {...this.state.user, username: json.username} });
+                if (json.code === '111') this.setState({ isLogin: false });
                 console.log(json);
             })
             .catch((err) => console.log(err))
@@ -87,7 +90,7 @@ class Frontpage extends React.Component {
         return (
             <div className='frontpage-wrapper'>
                 <Header themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} view={this.state.view} toggleView={this.toggleView} sort={this.state.sort} toggleSort={this.toggleSort}
-                openInSmallIFrame={this.openInSmallIFrame} isLogin={this.state.isLogin}/>
+                openInSmallIFrame={this.openInSmallIFrame} isLogin={this.state.isLogin} user={this.state.user}/>
                 <div className='main-content-wrapper'>
                     <div className='main-content-wrapper-box'>
                         <div className='posts-wrapper'>

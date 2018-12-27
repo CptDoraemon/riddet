@@ -23,7 +23,8 @@
     width: 100%;
 }
 .header-fixed {
-    width: 100%;
+    width: calc(100% - 20px);
+    padding: 0 10px;
     height: 50px;
     background-color: white;
     position: fixed;
@@ -113,7 +114,8 @@
 }
 .header-fixed-user-button {
     height: 35px;
-    width: 80px;
+    width: fit-content;
+    padding: 0 20px;
     border-radius: 10px;
     border: solid 1px rgb(255, 255, 255);
     color: grey;
@@ -121,6 +123,13 @@
 }
 .header-fixed-user-button:hover {
     border: solid 1px rgb(240, 240, 240);
+}
+.header-fixed-user-button-username {
+    font-weight: bold;
+    width: fit-content;
+    padding: 0 20px 0 5px;
+    font-size: 14px;
+    color: orange;
 }
 .header-fixed-user-dropdown-active {
     position: absolute;
