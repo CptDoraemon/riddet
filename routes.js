@@ -23,9 +23,9 @@ module.exports = function (app, db) {
         res.redirect('/');
     }));
 
-    // 100 success; 101 invalid email; 102 invalid username; 103 invalid password
+    // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
     // 104 email taken; 105 username taken; 106 database error
-    // 107 login failed
+    // 110 login success; 111 login failed
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -42,7 +42,7 @@ module.exports = function (app, db) {
             })
         }
     });
-    app.post('/signup/second', (req, res) => {
+    app.post('/signup/second', (req, res, next) => {
         let email = req.body.email;
         let username = req.body.username;
         let password = req.body.password;
@@ -92,12 +92,12 @@ module.exports = function (app, db) {
                         email: email,
                         username: username,
                         password: hash
-                    }, (err, doc) => {
+                    }, (err, user) => {
                         if (err) {
                             console.log(err);
                             res.json('106');
                         } else {
-                            res.json('100');
+                            next(null, user);
                         }
                     })
                 }
@@ -106,6 +106,16 @@ module.exports = function (app, db) {
 
         checkEmail();
 
+    },
+        passport.authenticate('local', { failureRedirect: '/loginFailed',
+                                        successRedirect: '/loginSuccess' })
+    );
+
+    app.get('/loginSuccess', (req, res) => {
+        res.json('110')
+    });
+    app.get('/loginFailed', (req, res) => {
+        res.json('111')
     });
 
     app.post('/login', (req, res) => {
@@ -114,29 +124,6 @@ module.exports = function (app, db) {
 
     });
 
-    app.post('signup', (req, res, next) => {
-        let hash = bcrypt.hashSync(req.body.password, 8);
-        db.collection('users').findOne({ username: req.body.username }, function (err, user) {
-            if(err) {
-                next(err);
-            } else if (user) {
-                res.redirect('/');
-            } else {
-                db.collection('users').insertOne({
-                    username: req.body.username,
-                    password: hash
-                }, (err, doc) => {
-                    if(err) {
-                        res.redirect('/');
-                    } else {
-                        next(null, user)
-                    }
-                })
-            }
-        })
-    }, passport.authenticate('local', { failureRedirect: '/' }), (req, res, next) => {
-        res.redirect('/');
-    });
 
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));

@@ -25,10 +25,13 @@ module.exports = function (app, db) {
         )
     });
 
-    passport.use(new LocalStrategy(
-        function(email, password, done) {
-            db.collection('users').findOne({ email: email }, function (err, user) {
-                console.log('User ' + email + 'attempted to log in.');
+    passport.use(new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password'
+    },
+        function(username, password, done) {
+            db.collection('users').findOne({ email: username }, function (err, user) {
+                console.log('User ' + username + 'attempted to log in.');
                 if (err) { return done(err); }
                 if (!user) {return done(null, false); }
                 bcrypt.compare(password, user.password, (err, res) => {

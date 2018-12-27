@@ -120,7 +120,7 @@ class Signup extends React.Component {
                     this.setState({errorPassword: 'Connection error, please try again.'});
                     return;
                 }
-                if (json === '100') {
+                if (json === '110') {
                     window.location = '/welcome';
                 }
             })

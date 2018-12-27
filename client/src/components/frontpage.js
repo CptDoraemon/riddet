@@ -16,7 +16,7 @@ function IFrame(props) {
                     <IoIosClose size='50px'/>
                 </Link>
             </div>
-            <iframe title='iframe in frontpage' src={props.link}> </iframe>
+            <iframe title='iframe in frontpage' id='iframe' src={props.link} onLoad={props.handleIFrameChange}> </iframe>
         </div>
     )
 }
@@ -31,6 +31,8 @@ class Frontpage extends React.Component {
         this.toggleView = this.toggleView.bind(this);
         this.toggleSort = this.toggleSort.bind(this);
         this.openInSmallIFrame = this.openInSmallIFrame.bind(this);
+        this.handleIFrameChange = this.handleIFrameChange.bind(this);
+        this.closeIFrame = this.closeIFrame.bind(this);
     }
     toggleView (e) {
         this.setState({
@@ -42,12 +44,24 @@ class Frontpage extends React.Component {
             sort: item
         })
     }
+    toggleBodyOverflow(link) {
+        link === '' ? document.body.style.overflow = 'auto' : document.body.style.overflow = 'hidden';
+    }
     openInSmallIFrame(link) {
         this.setState({
             smallIFrame: link
         });
-
-        link === '' ? document.body.style.overflow = 'auto' : document.body.style.overflow = 'hidden';
+        this.toggleBodyOverflow(link);
+    }
+    handleIFrameChange() {
+        const url = document.getElementById('iframe').contentWindow.location.href;
+        if ((/welcome$/i).test(url)) {
+            setTimeout(this.closeIFrame, 3000)
+        }
+    }
+    closeIFrame() {
+        this.setState({smallIFrame: ''});
+        this.toggleBodyOverflow('');
     }
     render() {
         return (
@@ -72,7 +86,7 @@ class Frontpage extends React.Component {
                         </div>
                     </div>
                 </div>
-                { this.state.smallIFrame === '' ? null : <IFrame link={this.state.smallIFrame} openInSmallIFrame={this.openInSmallIFrame}/> }
+                { this.state.smallIFrame === '' ? null : <IFrame link={this.state.smallIFrame} openInSmallIFrame={this.openInSmallIFrame} handleIFrameChange={this.handleIFrameChange}/> }
             </div>
         )
     }
