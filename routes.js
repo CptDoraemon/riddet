@@ -19,10 +19,6 @@ module.exports = function (app, db) {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });
 
-    app.post('/login', passport.authenticate('local', { failureRedirect: '/'}, (req, res) => {
-        res.redirect('/');
-    }));
-
     // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed
@@ -119,10 +115,18 @@ module.exports = function (app, db) {
         res.json('111')
     });
 
-    app.post('/login', (req, res) => {
-        let email = req.body.email;
-        let password = req.body.password;
+    app.post('/login',
+        passport.authenticate('local', { failureRedirect: '/loginFailed', successRedirect: '/loginSuccess' })
 
+    );
+
+    app.get('/verifyAuthentication', (req, res) => {
+        req.isAuthenticated() ? res.json('110') : res.json('111');
+    });
+
+    app.get('/logout', (req, res) => {
+        req.logout();
+        res.redirect('/');
     });
 
 

@@ -26,13 +26,15 @@ class Frontpage extends React.Component {
         this.state = {
             view: 'card',
             sort: 'hot',
-            smallIFrame: ''
+            smallIFrame: '',
+            isLogin: false
         };
         this.toggleView = this.toggleView.bind(this);
         this.toggleSort = this.toggleSort.bind(this);
         this.openInSmallIFrame = this.openInSmallIFrame.bind(this);
         this.handleIFrameChange = this.handleIFrameChange.bind(this);
         this.closeIFrame = this.closeIFrame.bind(this);
+        this.verifyAuthentication = this.verifyAuthentication.bind(this);
     }
     toggleView (e) {
         this.setState({
@@ -62,12 +64,30 @@ class Frontpage extends React.Component {
     closeIFrame() {
         this.setState({smallIFrame: ''});
         this.toggleBodyOverflow('');
+        this.verifyAuthentication();
+    }
+    verifyAuthentication() {
+        fetch('/verifyAuthentication', {
+            method: 'GET',
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            }}
+        ).then(res => res.json())
+            .then(json => {
+                if (json === '110') this.setState({isLogin: true});
+                if (json === '111') this.setState({isLogin: false});
+                console.log(json);
+            })
+            .catch((err) => console.log(err))
+    }
+    componentDidMount() {
+        this.verifyAuthentication();
     }
     render() {
         return (
             <div className='frontpage-wrapper'>
                 <Header themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} view={this.state.view} toggleView={this.toggleView} sort={this.state.sort} toggleSort={this.toggleSort}
-                openInSmallIFrame={this.openInSmallIFrame}/>
+                openInSmallIFrame={this.openInSmallIFrame} isLogin={this.state.isLogin}/>
                 <div className='main-content-wrapper'>
                     <div className='main-content-wrapper-box'>
                         <div className='posts-wrapper'>

@@ -108,6 +108,29 @@ class HeaderFixedUser extends React.Component{
             dropdown: false
         })
     }
+    dropdownList() {
+        if (!this.props.isLogin) {
+            return (
+                <div className='header-fixed-user-dropdown-active-item' onClick={() => this.props.openInSmallIFrame('/login')}>
+                    <span>Log in / Sign up</span>
+                </div>
+            )
+        } else {
+            return (
+                <React.Fragment>
+                    <div className='header-fixed-user-dropdown-active-item'>
+                        <span>Settings</span>
+                    </div>
+                    <div className='header-fixed-user-dropdown-active-item'>
+                        <Link to='/logout'>
+                            <span>Log out</span>
+                        </Link>
+                    </div>
+                </React.Fragment>
+            )
+        }
+
+    }
     componentDidMount () {
         window.addEventListener('click', this.closeDropdown);
     }
@@ -123,9 +146,7 @@ class HeaderFixedUser extends React.Component{
                 </button>
                 <div
                     className={this.state.dropdown ? 'header-fixed-user-dropdown-active' : 'header-fixed-user-dropdown-inactive'}>
-                    <div className='header-fixed-user-dropdown-active-item' onClick={() => this.props.openInSmallIFrame('/login')}>
-                        <span>Log in / Sign up</span>
-                    </div>
+                    { this.dropdownList() }
                 </div>
             </div>
         )
@@ -135,14 +156,16 @@ class HeaderFixedUser extends React.Component{
 
 class HeaderFixed extends React.Component {
     render() {
+        const signup = !this.props.isLogin ? <HeaderFixedSignup openInSmallIFrame={this.props.openInSmallIFrame}/> : null;
+
         return (
             <div className='header-fixed flex-row-even'>
                     <HeaderFixedLogo />
                     <HeaderFixedSubs themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                     <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
                     <HeaderFixedTools />
-                    <HeaderFixedSignup openInSmallIFrame={this.props.openInSmallIFrame}/>
-                    <HeaderFixedUser openInSmallIFrame={this.props.openInSmallIFrame}/>
+                    { signup }
+                    <HeaderFixedUser openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin}/>
             </div>
         );
     }
@@ -296,7 +319,7 @@ class Header extends React.Component {
     render() {
         return (
             <div className='header-wrapper'>
-                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame}/>
+                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin}/>
                 <HeaderFixedPlaceholder />
                 <Banner1 themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                 <Banner2 themeColor={this.props.themeColor}/>

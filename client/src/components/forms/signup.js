@@ -124,7 +124,7 @@ class Signup extends React.Component {
                     window.location = '/welcome';
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => this.setState({errorPassword: err}));
     }
     firstStageForm() {
         return (
