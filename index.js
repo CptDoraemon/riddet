@@ -23,7 +23,8 @@ app.use(helmet());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 mongo.connect(uristring, { useNewUrlParser: true }, (err, client) => {
-    let db = client.db('freecodecamp');
+    let dbName = process.env.DBNAME || 'freecodecamp';
+    let db = client.db('dbName');
 
     if(err) {
         console.log('Database error: ' + err);

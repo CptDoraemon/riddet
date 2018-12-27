@@ -33,6 +33,7 @@ module.exports = function (app, db) {
         } else {
             db.collection('users').findOne( {email: email}, (err, user) => {
                 if (err) {
+                    res.json('106');
                     console.log(err);
                 } else if (user) {
                     res.json('104');
