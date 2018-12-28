@@ -47,7 +47,7 @@ class Frontpage extends React.Component {
                             <Card />
                         </div>
                         <div className='infos-wrapper'>
-                            <Info themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
+                            <Info {...this.props} />
                         </div>
                     </div>
                 </div>

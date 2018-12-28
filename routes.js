@@ -14,6 +14,11 @@ module.exports = function (app, db) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(__dirname+'/client/build/index.html'));
+    });
+
     // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed
@@ -127,11 +132,6 @@ module.exports = function (app, db) {
 
     app.get('/createpost', (req, res) => {
         req.isAuthenticated() ? res.redirect('/createpost') : res.redirect('/')
-    });
-
-
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });
 
     app.get('*', (req, res) => {

@@ -6,6 +6,9 @@ import { HeaderLite } from '../header';
 import { TextEditor } from './texteditor';
 
 class Createpost extends React.Component {
+    componentDidMount() {
+        this.props.verifyAuthentication();
+    }
     render() {
         return (
             <div className='createpost-wrapper'>

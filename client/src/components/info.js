@@ -52,9 +52,7 @@ class Info extends React.Component {
                             <p>First Guild in Riddet! Guild Messages will be showing here.</p>
                         </div>
                         <button className='info-button' style={{backgroundColor: this.props.themeColor[0]}}>JOIN GUILD</button>
-                        <a href='/createpost'>
-                            <button className='info-button' style={{backgroundColor: this.props.themeColor[0]}}>create post</button>
-                        </a>
+                        <button className='info-button' style={{backgroundColor: this.props.themeColor[0]}} onClick={this.props.createPost}>create post</button>
                     </div>
                 </div>
                 <div className='info-wrapper'>

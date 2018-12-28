@@ -42,6 +42,7 @@ class Index extends React.Component {
         this.handleIFrameChange = this.handleIFrameChange.bind(this);
         this.closeIFrame = this.closeIFrame.bind(this);
         this.verifyAuthentication = this.verifyAuthentication.bind(this);
+        this.createPost = this.createPost.bind(this);
     }
     openInSmallIFrame(link) {
         this.setState({
@@ -76,6 +77,9 @@ class Index extends React.Component {
             })
             .catch((err) => console.log(err))
     }
+    createPost() {
+        this.state.isLogin ? window.location.replace('/createpost') : this.openInSmallIFrame('/login')
+    }
     render() {
         const themeColor = ['rgb(149, 125, 25)', 'rgb(225, 197, 81)', 'rgb(250, 245, 224)'];
         const themeLogo = function (size) {
@@ -103,7 +107,7 @@ class Index extends React.Component {
             <Router>
                 <ScrollToTop>
                     <Switch>
-                        <Route path="/" exact render={(props) => <Frontpage {...props} {...authenticationTools} {...themeTools}/>} />
+                        <Route path="/" exact render={(props) => <Frontpage {...props} {...authenticationTools} {...themeTools} createPost={this.createPost}/>} />
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                         <Route path="/welcome" exact render={(props) => <Welcome {...props} /> } />

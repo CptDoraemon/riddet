@@ -10,7 +10,7 @@ import { MdWhatshot, MdNewReleases } from "react-icons/md";
 
 function HeaderFixedLogo (props) {
     return (
-        <div className='header-fixed-logo flex-row-even'>
+        <div className='header-fixed-logo flex-row-even pointer' onClick={() => window.location.replace('/')}>
             <IoIosAnalytics size='30px'/>
             <span>riddet</span>
         </div>
@@ -328,7 +328,7 @@ class HeaderLite extends React.Component {
     render() {
         return (
             <div className='header-wrapper'>
-                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
+                <HeaderFixed {...this.props}/>
                 <HeaderFixedPlaceholder />
             </div>
         )
