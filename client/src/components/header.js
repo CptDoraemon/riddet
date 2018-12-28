@@ -132,8 +132,8 @@ class HeaderFixedUser extends React.Component{
                     <div className='header-fixed-user-dropdown-active-item'>
                         <span>Settings</span>
                     </div>
-                    <div className='header-fixed-user-dropdown-active-item'>
-                        <span onClick={this.logout}>Log out</span>
+                    <div className='header-fixed-user-dropdown-active-item' onClick={this.logout}>
+                        <span>Log out</span>
                     </div>
                 </React.Fragment>
             )
@@ -324,8 +324,18 @@ class Banner3 extends React.Component{
     }
 }
 
+class HeaderLite extends React.Component {
+    render() {
+        return (
+            <div className='header-wrapper'>
+                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
+                <HeaderFixedPlaceholder />
+            </div>
+        )
+    }
+}
 
-class Header extends React.Component {
+class HeaderMax extends React.Component {
     render() {
         return (
             <div className='header-wrapper'>
@@ -339,4 +349,4 @@ class Header extends React.Component {
     }
 }
 
-export { Header };
+export { HeaderMax, HeaderLite};
