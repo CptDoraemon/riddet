@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './header.css';
 
 import { IoIosAnalytics, IoIosSearch, IoIosTrendingUp, IoIosStats, IoIosCube, IoMdPerson, IoMdArrowDropdown } from "react-icons/io";
@@ -10,10 +10,12 @@ import { MdWhatshot, MdNewReleases } from "react-icons/md";
 
 function HeaderFixedLogo (props) {
     return (
-        <div className='header-fixed-logo flex-row-even pointer' onClick={() => window.location.replace('/')}>
-            <IoIosAnalytics size='30px'/>
-            <span>riddet</span>
-        </div>
+        <Link to='/'>
+            <div className='header-fixed-logo flex-row-even pointer'>
+                <IoIosAnalytics size='30px'/>
+                <span>riddet</span>
+            </div>
+        </Link>
     )
 }
 

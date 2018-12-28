@@ -131,7 +131,9 @@ module.exports = function (app, db) {
     });
 
     app.get('/createpost', (req, res) => {
-        req.isAuthenticated() ? res.redirect('/createpost') : res.redirect('/')
+        if(!req.isAuthenticated()) {
+            res.redirect('/')
+        }
     });
 
     app.get('*', (req, res) => {
