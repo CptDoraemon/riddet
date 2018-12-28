@@ -130,8 +130,8 @@ module.exports = function (app, db) {
         res.json('120');
     });
 
-    app.get('/createpost', (req, res) => {
-        req.isAuthenticated() ? res.json({code: '110', username: req.user.username}) : res.redirect('/');
+    app.get('/createpost', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.redirect('/');
     });
 
     app.get('*', (req, res) => {
