@@ -15,6 +15,7 @@ class Signup extends React.Component {
             errorEmail: null,
             errorUsername: null,
             errorPassword: null,
+            successMessage: null
         };
         this.handleFirstSubmit = this.handleFirstSubmit.bind(this);
         this.handleSecondSubmit = this.handleSecondSubmit.bind(this);
@@ -120,8 +121,15 @@ class Signup extends React.Component {
                     this.setState({errorPassword: 'Connection error, please try again.'});
                     return;
                 }
-                if (json === '110') {
-                    window.location = '/welcome';
+                if (json.code === '110') {
+                    //login success
+                    this.setState({successMessage: json.username + ', welcome to Riddet!'});
+                    setTimeout(() => window.location = '/', 3000);
+                }
+                if (json.code === '111') {
+                    //login failed
+                    this.setState({successMessage: 'welcome to Riddet!'});
+                    setTimeout(() => window.location = '/', 3000);
                 }
             })
             .catch((err) => this.setState({errorPassword: err}));
@@ -159,18 +167,31 @@ class Signup extends React.Component {
         )
     }
     render() {
-        return (
-            <div className='form-wrapper paris-bg'>
-                <div className='form-left'>
-                </div>
-                <div className='form-right'>
-                    <h3>Sign up</h3>
+        if (!this.state.successMessage) {
+            return (
+                <div className='form-wrapper paris-bg'>
+                    <div className='form-left'>
+                    </div>
+                    <div className='form-right'>
+                        <h3>Sign up</h3>
 
-                    { this.state.firstStage ? this.firstStageForm() : this.secondStageForm() }
+                        { this.state.firstStage ? this.firstStageForm() : this.secondStageForm() }
 
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div className='form-wrapper paris-bg'>
+                    <div className='form-left'>
+                    </div>
+                    <div className='form-right'>
+                        <p className='form-login-success'> {this.state.successMessage} </p>
+                        <p className='form-login-success'>This window will be closed in 3 seconds.</p>
+                    </div>
+                </div>
+            )
+        }
     }
 }
 

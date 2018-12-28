@@ -52,7 +52,7 @@ class Info extends React.Component {
                             <p>First Guild in Riddet! Guild Messages will be showing here.</p>
                         </div>
                         <button className='info-button' style={{backgroundColor: this.props.themeColor[0]}}>JOIN GUILD</button>
-                        <Link to={this.props.isLogin ? '/createpost' : '/login'}>
+                        <Link to={this.props.isLogin ? '/createpost' : '/login'} target={this.props.isLogin ? null : 'iframe-s'}>
                             <button className='info-button' style={{backgroundColor: this.props.themeColor[0]}}>create post</button>
                         </Link>
                     </div>

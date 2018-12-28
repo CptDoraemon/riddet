@@ -31,8 +31,7 @@ class Frontpage extends React.Component {
     render() {
         return (
             <div className='frontpage-wrapper'>
-                <HeaderMax themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} view={this.state.view} toggleView={this.toggleView} sort={this.state.sort} toggleSort={this.toggleSort}
-                openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
+                <HeaderMax {...this.props} view={this.state.view} toggleView={this.toggleView} sort={this.state.sort} toggleSort={this.toggleSort} />
                 <div className='main-content-wrapper'>
                     <div className='main-content-wrapper-box'>
                         <div className='posts-wrapper'>

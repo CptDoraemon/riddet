@@ -66,6 +66,9 @@ textarea {
     justify-content: center;
     align-items: center;
 }
+.iframe-wrapper-hidden {
+    display: none;
+}
 .iframe-close-icon {
     position: absolute;
     top: calc(50% - 260px);

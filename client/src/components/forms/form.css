@@ -139,3 +139,10 @@
 .form-signup a:hover {
     opacity: 0.8;
 }
+.form-login-success {
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+    line-height: 28px;
+    color: rgb(54, 121, 204);
+}

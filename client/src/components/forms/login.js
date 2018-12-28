@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import './form.css';
 import { FormItem } from './formItem';
 
@@ -10,7 +10,8 @@ class Login extends React.Component {
         this.state = {
             email: '',
             password: '',
-            error: null
+            error: null,
+            successMessage: null
         };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -31,13 +32,14 @@ class Login extends React.Component {
             }
         }).then(res => res.json())
             .then(json => {
-                if (json === '111') {
+                if (json.code === '111') {
                     this.setState({
                         error: 'The credentials you supplied do not match our record'
                     })
                 }
-                if (json === '110') {
-                    window.location = '/welcome';
+                if (json.code === '110') {
+                    this.setState({successMessage: 'Welcome back ' + json.username +'!'});
+                    setTimeout(() => window.location='/', 3000);
                 }
             }).catch((err) => {
                 this.setState({
@@ -46,29 +48,43 @@ class Login extends React.Component {
         })
     }
     render() {
-        return (
-            <div className='form-wrapper tsunami-bg'>
-                <div className='form-left'>
-                </div>
-                <div className='form-right'>
-                    <h3>Log in</h3>
-                    <form onSubmit={this.handleSubmit} className='form-form'>
-
-                        <FormItem label='Email' value={this.state.email} handler={(e) => this.handleChange(e, 'email')}/>
-                        <FormItem label='Password' value={this.state.password} handler={(e) => this.handleChange(e, 'password')} type='password'/>
-
-                        <span className='form-form-error'> {this.state.error} </span>
-                        <button>Log in</button>
-                    </form>
-                    <div className='form-forget'>
-                        <Link to=''>Forgot your password?</Link>
+        if (!this.state.successMessage) {
+            return (
+                <div className='form-wrapper tsunami-bg'>
+                    <div className='form-left'>
                     </div>
-                    <div className='form-signup'>
-                        <span>Don't have an account? <Link to='/signup'>Sign up</Link> today!</span>
+                    <div className='form-right'>
+                        <h3>Log in</h3>
+                        <form onSubmit={this.handleSubmit} className='form-form'>
+
+                            <FormItem label='Email' value={this.state.email} handler={(e) => this.handleChange(e, 'email')}/>
+                            <FormItem label='Password' value={this.state.password} handler={(e) => this.handleChange(e, 'password')} type='password'/>
+
+                            <span className='form-form-error'> {this.state.error} </span>
+                            <button>Log in</button>
+                            <span className='form-form-error'> {this.state.successMessage} </span>
+                        </form>
+                        <div className='form-forget'>
+                            <Link to=''>Forgot your password?</Link>
+                        </div>
+                        <div className='form-signup'>
+                            <span>Don't have an account? <Link to='/signup'>Sign up</Link> today!</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div className='form-wrapper tsunami-bg'>
+                    <div className='form-left'>
+                    </div>
+                    <div className='form-right'>
+                        <p className='form-login-success'> {this.state.successMessage} </p>
+                        <p className='form-login-success'>This window will be closed in 3 seconds.</p>
+                    </div>
+                </div>
+            )
+        }
     }
 }
 

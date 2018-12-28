@@ -84,8 +84,12 @@ function HeaderFixedTools (props) {
 function HeaderFixedSignup (props) {
     return (
         <div className='header-fixed-signup-login flex-row-even'>
-            <button className='header-fixed-login pointer' onClick={() => props.openInSmallIFrame('/login')}>LOG IN</button>
-            <button className='header-fixed-signup pointer' onClick={() => props.openInSmallIFrame('/signup')}>SIGN UP</button>
+            <Link to='/login' target='iframe-s'>
+                <button className='header-fixed-login pointer'>LOG IN</button>
+            </Link>
+            <Link to='/signup' target='iframe-s'>
+                <button className='header-fixed-signup pointer'>SIGN UP</button>
+            </Link>
         </div>
     )
 }
@@ -95,7 +99,7 @@ class HeaderFixedUser extends React.Component{
         super (props);
         this.state = {
             dropdown: false
-        }
+        };
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.closeDropdown = this.closeDropdown.bind(this);
     }
@@ -168,7 +172,7 @@ class HeaderFixedUser extends React.Component{
 
 class HeaderFixed extends React.Component {
     render() {
-        const signup = !this.props.isLogin ? <HeaderFixedSignup openInSmallIFrame={this.props.openInSmallIFrame}/> : null;
+        const signup = !this.props.isLogin ? <HeaderFixedSignup /> : null;
 
         return (
             <div className='header-fixed flex-row-even'>
@@ -177,7 +181,7 @@ class HeaderFixed extends React.Component {
                     <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
                     <HeaderFixedTools />
                     { signup }
-                    <HeaderFixedUser openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
+                    <HeaderFixedUser isLogin={this.props.isLogin} user={this.props.user}/>
             </div>
         );
     }
@@ -280,7 +284,7 @@ class Banner3 extends React.Component{
         const handlers = {
             onMouseEnter: (e) => this.handleSortEnter(e),
             onMouseLeave: (e) => this.handleSortLeave(e),
-        }
+        };
         return (
             <div className='banner3 flex-row-center'>
                 <div className='banner3-container'>
@@ -341,7 +345,7 @@ class HeaderMax extends React.Component {
     render() {
         return (
             <div className='header-wrapper'>
-                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} openInSmallIFrame={this.props.openInSmallIFrame} isLogin={this.props.isLogin} user={this.props.user}/>
+                <HeaderFixed themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle} isLogin={this.props.isLogin} user={this.props.user}/>
                 <HeaderFixedPlaceholder />
                 <Banner1 themeColor={this.props.themeColor} themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                 <Banner2 themeColor={this.props.themeColor}/>

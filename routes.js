@@ -110,10 +110,10 @@ module.exports = function (app, db) {
     );
 
     app.get('/loginSuccess', (req, res) => {
-        res.json('110')
+        res.json({code: '110', username: req.user.username})
     });
     app.get('/loginFailed', (req, res) => {
-        res.json('111')
+        res.json({code: '111'})
     });
 
     app.post('/login',
@@ -131,9 +131,7 @@ module.exports = function (app, db) {
     });
 
     app.get('/createpost', (req, res) => {
-        if(!req.isAuthenticated()) {
-            res.redirect('/')
-        }
+        req.isAuthenticated() ? res.json({code: '110', username: req.user.username}) : res.redirect('/');
     });
 
     app.get('*', (req, res) => {

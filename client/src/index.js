@@ -15,53 +15,52 @@ import { Signup } from './components/forms/signup';
 import { Welcome } from './components/forms/welcome';
 import { Createpost } from './components/createpost/createpost';
 
-function IFrame(props) {
-    return(
-        <div className='iframe-wrapper'>
-            <div className='iframe-close-icon' onClick={() => props.openInSmallIFrame('')}>
-                <Link to=''>
+class IFrameS extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            isWorking: false
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.close = this.close.bind(this);
+    }
+    handleChange() {
+        const url = document.getElementById("iframe-s").contentWindow.location.href;
+        if (url === window.location.href) {
+            window.location.reload();
+        } else {
+            this.setState({isWorking: true});
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    close() {
+        this.setState({
+            isWorking: false
+        });
+        document.body.style.overflow = 'auto';
+    }
+    render() {
+        return(
+            <div className={this.state.isWorking ? 'iframe-wrapper' : 'iframe-wrapper-hidden'}>
+                <div className='iframe-close-icon pointer' onClick={this.close}>
                     <IoIosClose size='50px'/>
-                </Link>
+                </div>
+                <iframe title='iframe-s' id='iframe-s' name='iframe-s' onLoad={this.handleChange}> </iframe>
             </div>
-            <iframe title='iframe in frontpage' id='iframe' src={props.link} onLoad={props.handleIFrameChange}> </iframe>
-        </div>
-    )
+        )
+    }
 }
 
 class Index extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            smallIFrame: '',
             isLogin: false,
             user: {
                 username: null,
             }
         };
-        this.openInSmallIFrame = this.openInSmallIFrame.bind(this);
-        this.handleIFrameChange = this.handleIFrameChange.bind(this);
-        this.closeIFrame = this.closeIFrame.bind(this);
         this.verifyAuthentication = this.verifyAuthentication.bind(this);
-    }
-    openInSmallIFrame(link) {
-        this.setState({
-            smallIFrame: link
-        });
-        this.toggleBodyOverflow(link);
-    }
-    handleIFrameChange() {
-        const url = document.getElementById('iframe').contentWindow.location.href;
-        if ((/welcome$/i).test(url)) {
-            setTimeout(this.closeIFrame, 3000)
-        }
-    }
-    closeIFrame() {
-        this.setState({smallIFrame: ''});
-        this.toggleBodyOverflow('');
-        this.verifyAuthentication();
-    }
-    toggleBodyOverflow(link) {
-        link === '' ? document.body.style.overflow = 'auto' : document.body.style.overflow = 'hidden';
     }
     verifyAuthentication() {
         fetch('/verifyAuthentication', {
@@ -86,12 +85,8 @@ class Index extends React.Component {
         const themeTitle = 'g/JohnCooperWorks';
 
         const authenticationTools = {
-            smallIFrame: this.state.smallIFrame,
             isLogin: this.state.isLogin,
             user: this.state.user,
-            openInSmallIFrame: this.openInSmallIFrame,
-            handleIFrameChange: this.handleIFrameChange,
-            closeIFrame: this.closeIFrame,
             verifyAuthentication: this.verifyAuthentication
         };
         const themeTools = {
@@ -106,11 +101,10 @@ class Index extends React.Component {
                         <Route path="/" exact render={(props) => <Frontpage {...props} {...authenticationTools} {...themeTools} />} />
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
-                        <Route path="/welcome" exact render={(props) => <Welcome {...props} /> } />
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
                     </Switch>
 
-                    { this.state.smallIFrame === '' ? null : <IFrame link={this.state.smallIFrame} openInSmallIFrame={this.openInSmallIFrame} handleIFrameChange={this.handleIFrameChange}/> }
+                    <IFrameS />
                 </ScrollToTop>
             </Router>
         )
