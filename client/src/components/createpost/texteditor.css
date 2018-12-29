@@ -31,6 +31,40 @@
     width: 100%;
     height: 35px;
     background-color: rgb(240, 240, 240);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 10px;
+}
+.text-editor-editor-toolbox-item {
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+    position: relative;
+    color: grey;
+    border-radius: 5px;
+}
+.text-editor-editor-toolbox-item:hover {
+    background-color: grey;
+    color: white;
+}
+.text-editor-editor-toolbox-label-active {
+    width: fit-content;
+    display: block;
+    position: absolute;
+    color: white;
+    background-color: black;
+    padding: 5px 10px;
+    font-size: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: capitalize;
+    left: 0;
+    top: 110%;
+}
+.text-editor-editor-toolbox-label-inactive {
+    display: none;
 }
 .text-editor-editor-wrapper textarea {
     width: calc(100% - 40px);
@@ -40,4 +74,22 @@
 }
 .text-editor-editor-default-text{
     color: grey;
+}
+.text-editor-editor-wrapper:hover, .text-editor-editor-wrapper:focus-within {
+    border: solid 1px grey;
+}
+.text-editor-button {
+    width: calc(100% - 40px);
+    padding: 10px 20px;
+}
+.text-editor-button button {
+    color: white;
+    width: 150px;
+    height: 35px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.text-editor-button button:hover {
+    opacity: 0.7;
 }

@@ -28,7 +28,7 @@ class Createpost extends React.Component {
                         </ol>
                     </div>
                     <div className='createpost-content-text-editor'>
-                        <TextEditor/>
+                        <TextEditor themeColor={this.props.themeColor}/>
                     </div>
                 </div>
             </div>

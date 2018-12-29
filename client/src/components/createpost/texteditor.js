@@ -1,5 +1,30 @@
 import React from 'react';
 import './texteditor.css';
+import { FiBold, FiItalic, FiAlertCircle, FiEdit3, FiImage } from "react-icons/fi";
+
+class ItemGenerator extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isHover: false,
+        };
+        this.handleHover = this.handleHover.bind(this);
+    }
+    handleHover() {
+        this.setState({
+            isHover: !this.state.isHover
+        })
+    }
+    render() {
+        const spanClassName = this.state.isHover ? 'text-editor-editor-toolbox-label-active' : 'text-editor-editor-toolbox-label-inactive'
+        return (
+            <div className='text-editor-editor-toolbox-item' onMouseEnter={this.handleHover} onMouseLeave={this.handleHover}>
+                <this.props.Icon size='inherit' />
+                <span className={spanClassName}>{this.props.label}</span>
+            </div>
+        )
+    }
+}
 
 class TextEditor extends React.Component {
     constructor(props) {
@@ -60,9 +85,17 @@ class TextEditor extends React.Component {
                     </div>
                     <div className='text-editor-editor-wrapper'>
                         <div className='text-editor-editor-toolbox'>
+                            <ItemGenerator Icon={FiBold} label='bold' />
+                            <ItemGenerator Icon={FiItalic} label='italic' />
+                            <ItemGenerator Icon={FiEdit3} label='delete' />
+                            <ItemGenerator Icon={FiAlertCircle} label='spoiler' />
+                            <ItemGenerator Icon={FiImage} label='add image' />
                         </div>
                         <textarea className={this.state.tePost === this.tePostDefault ? 'text-editor-editor-default-text' : null}
                             id='tePost' name='post' value={this.state.tePost} {...handlers}/>
+                    </div>
+                    <div className='text-editor-button'>
+                        <button style={{backgroundColor: this.props.themeColor[0]}}>Post</button>
                     </div>
                 </form>
             </div>
