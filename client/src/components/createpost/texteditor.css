@@ -5,12 +5,12 @@
     padding: 10px 0;
 }
 .text-editor-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 20px);
     padding: 10px 20px;
 }
 .text-editor-title textarea {
-    width: calc(100% - 40px);
-    padding: 8px 20px;
+    width: calc(100% - 20px);
+    padding: 8px 10px;
     height: 20px;
     line-height: 20px;
     border-radius: 5px;
@@ -40,14 +40,27 @@
 .text-editor-editor-toolbox-item {
     width: 20px;
     height: 20px;
-    padding: 5px;
     position: relative;
     color: grey;
     border-radius: 5px;
+    padding: 5px;
+    margin: 0 2px;
+    cursor: pointer;
 }
 .text-editor-editor-toolbox-item:hover {
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+}
+.text-editor-editor-toolbox-item-selected {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 0 2px;
     background-color: grey;
     color: white;
+    cursor: pointer;
 }
 .text-editor-editor-toolbox-label-active {
     width: fit-content;
@@ -56,7 +69,7 @@
     color: white;
     background-color: black;
     padding: 5px 10px;
-    font-size: 10px;
+    font-size: 12px;
     border-radius: 5px;
     font-weight: bold;
     text-transform: capitalize;
@@ -66,11 +79,25 @@
 .text-editor-editor-toolbox-label-inactive {
     display: none;
 }
-.text-editor-editor-wrapper textarea {
-    width: calc(100% - 40px);
+.text-editor-markdown-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.text-editor-editor-wrapper textarea, .text-editor-preview {
+    width: calc(50% - 20px);
+    padding: 10px;
     min-height: 280px;
     border: none;
-    padding: 20px;
+}
+.text-editor-preview {
+    background-color: rgb(250, 250, 250);
+}
+.text-editor-preview p{
+    width: 100%;
+    word-wrap: normal;
 }
 .text-editor-editor-default-text{
     color: grey;
