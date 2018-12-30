@@ -128,11 +128,13 @@ class HeaderFixedUser extends React.Component{
     dropdownList() {
         if (!this.props.isLogin) {
             return (
-                <div className='header-fixed-user-dropdown-active-item'>
+                <React.Fragment>
                     <Link to='/login' target='iframe-s'>
-                        <span>Log in / Sign up</span>
+                        <div className='header-fixed-user-dropdown-active-item'>
+                            <span>Log in / Sign up</span>
+                        </div>
                     </Link>
-                </div>
+                </React.Fragment>
             )
         } else {
             return (

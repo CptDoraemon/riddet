@@ -251,21 +251,23 @@ class TePost extends  React.Component {
     };
     shortcutListener(e) {
         let ctrl = (e.ctrlKey || e.metaKey);
-        if (e.key === 'b' && ctrl) {
-            e.preventDefault();
-            (this.toggleButton('bold'))();
-        }
-        if (e.key === 'i' && ctrl) {
-            e.preventDefault();
-            (this.toggleButton('italic'))();
-        }
-        if (e.key === 'd' && ctrl) {
-            e.preventDefault();
-            (this.toggleButton('strikethrough'))();
-        }
-        if (e.key === 's' && ctrl) {
-            e.preventDefault();
-            (this.toggleButton('spoiler'))();
+        if (document.activeElement === document.getElementById('tePost')) {
+            if (e.key === 'b' && ctrl) {
+                e.preventDefault();
+                (this.toggleButton('bold'))();
+            }
+            if (e.key === 'i' && ctrl) {
+                e.preventDefault();
+                (this.toggleButton('italic'))();
+            }
+            if (e.key === 'd' && ctrl) {
+                e.preventDefault();
+                (this.toggleButton('strikethrough'))();
+            }
+            if (e.key === 's' && ctrl) {
+                e.preventDefault();
+                (this.toggleButton('spoiler'))();
+            }
         }
     }
     componentDidUpdate() {
