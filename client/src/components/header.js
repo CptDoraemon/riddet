@@ -128,8 +128,10 @@ class HeaderFixedUser extends React.Component{
     dropdownList() {
         if (!this.props.isLogin) {
             return (
-                <div className='header-fixed-user-dropdown-active-item' onClick={() => this.props.openInSmallIFrame('/login')}>
-                    <span>Log in / Sign up</span>
+                <div className='header-fixed-user-dropdown-active-item'>
+                    <Link to='/login' target='iframe-s'>
+                        <span>Log in / Sign up</span>
+                    </Link>
                 </div>
             )
         } else {

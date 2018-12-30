@@ -5,7 +5,7 @@
     padding: 10px 0;
 }
 .text-editor-title {
-    width: calc(100% - 20px);
+    width: calc(100% - 40px);
     padding: 10px 20px;
 }
 .text-editor-title textarea {
@@ -27,7 +27,7 @@
     overflow: hidden;
     border: solid 1px rgb(220, 220, 220);
 }
-.text-editor-editor-toolbox {
+.text-editor-editor-toolbox-wrapper {
     width: 100%;
     height: 35px;
     background-color: rgb(240, 240, 240);
@@ -35,8 +35,20 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 10px;
 }
+.text-editor-editor-toolbox-left, .text-editor-editor-toolbox-center, .text-editor-editor-toolbox-right {
+    width: calc(34% - 20px);
+    height: 100%;
+    padding: 0 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.text-editor-editor-toolbox-center {
+    justify-content: center !important;
+}
+
 .text-editor-editor-toolbox-item {
     width: 20px;
     height: 20px;
@@ -91,13 +103,21 @@
     padding: 10px;
     min-height: 280px;
     border: none;
+    transition: width 0.5s, opacity 0.2s;
 }
 .text-editor-preview {
     background-color: rgb(250, 250, 250);
 }
 .text-editor-preview p{
     width: 100%;
-    word-wrap: normal;
+    height: 17px;
+}
+.text-editor-minimize{
+    width: 0 !important;
+    opacity: 0;
+}
+.text-editor-maximize {
+    width: calc(100% - 20px) !important;
 }
 .text-editor-editor-default-text{
     color: grey;

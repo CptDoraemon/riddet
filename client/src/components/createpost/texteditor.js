@@ -1,6 +1,6 @@
 import React from 'react';
 import './texteditor.css';
-import { FiBold, FiItalic, FiAlertCircle, FiEdit3, FiImage, FiList, FiArrowDownLeft, FiArrowDownRight } from "react-icons/fi";
+import { FiBold, FiItalic, FiAlertCircle, FiEdit3, FiImage, FiArrowDownLeft, FiArrowDownRight } from "react-icons/fi";
 
 class ItemGenerator extends React.Component {
     constructor(props) {
@@ -102,17 +102,19 @@ class TextEditor extends React.Component {
         while (preview.firstChild) {
             preview.removeChild(preview.firstChild);
         }
+        console.log(content);
         content = JSON.stringify(content);
+        console.log(content);
         content = content.slice(1, content.length - 1);
         content = content.split('\\n');
         content.map((i) => {
             node = document.createElement('p');
-            textnode = document.createTextNode(i);
+            textnode = i === '' ?  document.createTextNode(' '): document.createTextNode(i);
             node.appendChild(textnode);
             preview.appendChild(node);
         });
-
         console.log(content);
+
     }
     toggleButton(buttonName) {
         let toggleButton = () => {
@@ -130,7 +132,7 @@ class TextEditor extends React.Component {
                 } else {
                     post = this.state.tePost.slice();
                     selection = this.state.tePost.slice(start, end);
-                    selection = '<strong>' + selection + '</strong>';
+                    selection = '<b>' + selection + '</b>';
                     post = post.slice(0, start) + selection + post.slice(end, post.length);
                     this.setState({
                         tePost: post
@@ -140,12 +142,37 @@ class TextEditor extends React.Component {
         };
         return toggleButton;
     };
+    togglePreview(buttonName) {
+        let togglePreview = () => {
+            if(buttonName === 'markdown') {
+                !this.state.preview ? this.setState({markdown: !this.state.markdown}) : this.setState({markdown: true, preview: false});
+                }
+            if(buttonName === 'preview') {
+                !this.state.markdown ? this.setState({preview: !this.state.preview}) : this.setState({preview: true, markdown: false});
+            }
+            };
+        return togglePreview;
+        };
     render() {
         const handlers = {
             onChange: this.handleTextareaChange,
             onFocus: this.clearDefault,
             onBlur: this.handleBlur
         };
+
+        let markdownClassName;
+        let previewClassName;
+        if (this.state.markdown) {
+            markdownClassName = this.state.tePost === this.tePostDefault ? 'text-editor-editor-default-text text-editor-maximize' : 'text-editor-maximize';
+            previewClassName = 'text-editor-preview text-editor-minimize';
+        } else if (this.state.preview) {
+            markdownClassName = 'text-editor-minimize';
+            previewClassName = 'text-editor-preview text-editor-maximize';
+        } else {
+            markdownClassName = this.state.tePost === this.tePostDefault ? 'text-editor-editor-default-text' : null;
+            previewClassName = 'text-editor-preview';
+        }
+
         return (
             <div className='text-editor-wrapper'>
                 <form>
@@ -154,20 +181,25 @@ class TextEditor extends React.Component {
                                   id='teTitle' name='title' value={this.state.teTitle} {...handlers}/>
                     </div>
                     <div className='text-editor-editor-wrapper'>
-                        <div className='text-editor-editor-toolbox'>
-                            <ItemGenerator Icon={FiBold} label='bold' toggleButton={this.toggleButton('bold')} isSelected={this.state.bold}/>
-                            <ItemGenerator Icon={FiItalic} label='italic' toggleButton={this.toggleButton('italic')} isSelected={this.state.italic}/>
-                            <ItemGenerator Icon={FiEdit3} label='strikethrough' toggleButton={this.toggleButton('strikethrough')} isSelected={this.state.del}/>
-                            <ItemGenerator Icon={FiAlertCircle} label='spoiler' toggleButton={this.toggleButton('spoiler')} isSelected={this.state.spoiler}/>
-                            <ItemGenerator Icon={FiList} label='list' toggleButton={this.toggleButton('list')} isSelected={this.state.list}/>
-                            <ItemGenerator Icon={FiImage} label='add image' />
-                            <ItemGenerator Icon={FiArrowDownLeft} label='markdown' toggleButton={this.toggleButton('markdown')} isSelected={this.state.markdown}/>
-                            <ItemGenerator Icon={FiArrowDownRight} label='preview' toggleButton={this.toggleButton('preview')} isSelected={this.state.preview}/>
+                        <div className='text-editor-editor-toolbox-wrapper'>
+                            <div className='text-editor-editor-toolbox-left'>
+                                <ItemGenerator Icon={FiBold} label='bold' toggleButton={this.toggleButton('bold')} isSelected={this.state.bold}/>
+                                <ItemGenerator Icon={FiItalic} label='italic' toggleButton={this.toggleButton('italic')} isSelected={this.state.italic}/>
+                                <ItemGenerator Icon={FiEdit3} label='strikethrough' toggleButton={this.toggleButton('strikethrough')} isSelected={this.state.del}/>
+                                <ItemGenerator Icon={FiAlertCircle} label='spoiler' toggleButton={this.toggleButton('spoiler')} isSelected={this.state.spoiler}/>
+                                <ItemGenerator Icon={FiImage} label='add image' />
+                            </div>
+                            <div className='text-editor-editor-toolbox-center'>
+                                <ItemGenerator Icon={FiArrowDownRight} label='markdown' toggleButton={this.togglePreview('markdown')} isSelected={this.state.markdown}/>
+                                <ItemGenerator Icon={FiArrowDownLeft} label='preview' toggleButton={this.togglePreview('preview')} isSelected={this.state.preview}/>
+                            </div>
+                            <div className='text-editor-editor-toolbox-right'>
+                            </div>
                         </div>
                         <div className='text-editor-markdown-wrapper'>
-                            <textarea className={this.state.tePost === this.tePostDefault ? 'text-editor-editor-default-text' : null}
+                            <textarea className={markdownClassName}
                                 id='tePost' name='post' value={this.state.tePost} {...handlers}/>
-                            <div className='text-editor-preview' id='tePreview'>
+                            <div className={previewClassName} id='tePreview'>
 
                             </div>
                         </div>
