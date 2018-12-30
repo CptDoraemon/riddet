@@ -24,7 +24,6 @@
     margin: 0 20px;
     height: auto;
     border-radius: 5px;
-    overflow: hidden;
     border: solid 1px rgb(220, 220, 220);
 }
 .text-editor-editor-toolbox-wrapper {
@@ -35,6 +34,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    border-radius: 5px 5px 0 0;
 }
 .text-editor-editor-toolbox-left, .text-editor-editor-toolbox-center, .text-editor-editor-toolbox-right {
     width: calc(34% - 20px);
@@ -75,7 +75,6 @@
     cursor: pointer;
 }
 .text-editor-editor-toolbox-label-active {
-    width: fit-content;
     display: block;
     position: absolute;
     color: white;
@@ -85,8 +84,10 @@
     border-radius: 5px;
     font-weight: bold;
     text-transform: capitalize;
+    text-align: center;
     left: 0;
-    top: 110%;
+    bottom: 35px;
+    z-index: 999;
 }
 .text-editor-editor-toolbox-label-inactive {
     display: none;
@@ -104,9 +105,11 @@
     min-height: 280px;
     border: none;
     transition: width 0.5s, opacity 0.2s;
+    border-radius: 0 0 0 5px;
 }
 .text-editor-preview {
     background-color: rgb(250, 250, 250);
+    border-radius: 0 0 5px 0;
 }
 .text-editor-preview p{
     width: 100%;
