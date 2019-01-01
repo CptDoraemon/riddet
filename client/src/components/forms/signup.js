@@ -124,12 +124,12 @@ class Signup extends React.Component {
                 if (json.code === '110') {
                     //login success
                     this.setState({successMessage: json.username + ', welcome to Riddet!'});
-                    setTimeout(() => window.location = '/', 3000);
+                    setTimeout(() => window.location = '/close', 3000);
                 }
                 if (json.code === '111') {
                     //login failed
                     this.setState({successMessage: 'welcome to Riddet!'});
-                    setTimeout(() => window.location = '/', 3000);
+                    setTimeout(() => window.location = '/close', 3000);
                 }
             })
             .catch((err) => this.setState({errorPassword: err}));

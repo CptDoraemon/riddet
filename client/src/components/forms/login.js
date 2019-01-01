@@ -39,7 +39,7 @@ class Login extends React.Component {
                 }
                 if (json.code === '110') {
                     this.setState({successMessage: 'Welcome back ' + json.username +'!'});
-                    setTimeout(() => window.location='/', 3000);
+                    setTimeout(() => window.location='/close', 3000);
                 }
             }).catch((err) => {
                 this.setState({

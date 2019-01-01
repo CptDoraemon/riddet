@@ -1,8 +1,8 @@
 .card-wrapper {
-    width: 660px;
+    width: 680px;
     min-height: 200px;
     height: auto;
-    margin: 20px 20px 20px 0;
+    margin: 20px 10px 0 0;
     border-radius: 5px;
     border: solid 2px rgb(200, 200, 200);
     display: flex;
@@ -61,6 +61,7 @@
 .card-body-content {
     margin: 5px;
     max-height: 500px;
+    min-height: 120px;
     overflow: hidden;
 }
 .card-body-content-unfold {

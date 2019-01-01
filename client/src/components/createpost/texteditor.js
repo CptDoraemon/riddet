@@ -1,6 +1,8 @@
 import React from 'react';
 import './texteditor.css';
 import { FiBold, FiItalic, FiAlertCircle, FiEdit3, FiImage, FiArrowDownLeft, FiArrowDownRight } from "react-icons/fi";
+import './postparser.css';
+const postParser = require('./postparser.js');
 
 class ItemGenerator extends React.Component {
     constructor(props) {
@@ -27,16 +29,47 @@ class ItemGenerator extends React.Component {
     }
 }
 
-class TeTitle extends React.Component {
+function TeTitle (props) {
+        const handlers = {
+            onFocus: props.clearDefault,
+            onBlur: props.handleBlur
+        };
+        return (
+            <div className='text-editor-title'>
+                        <textarea
+                            className={props.teTitle === props.teTitleDefault ? 'text-editor-editor-default-text' : null}
+                            id='teTitle' name='title' value={props.teTitle} {...handlers}
+                            onChange={props.handleTitleChange}/>
+            </div>
+        )
+}
+
+class PostTextEditor extends  React.Component {
     constructor(props) {
         super(props);
         this.state = {
             teTitle: 'Title (required)',
+            tePost: 'Text (optional)',
+            bold: false,
+            italic: false,
+            spoiler: false,
+            strikethrough: false,
+            markdown: false,
+            preview: false,
+            selectionStart: null,
+            selectionEnd: null,
+            response: null,
+            isSubmitting: false,
         };
-        this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.tePostDefault = 'Text (optional)';
         this.teTitleDefault = 'Title (required)';
+        this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.handlePostChange = this.handlePostChange.bind(this);
         this.clearDefault = this.clearDefault.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
+        this.toggleButton = this.toggleButton.bind(this);
+        this.shortcutListener = this.shortcutListener.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     clearDefault(e) {
         let defaultValue = e.target.id === 'teTitle' ? this.teTitleDefault : this.tePostDefault;
@@ -65,57 +98,6 @@ class TeTitle extends React.Component {
         let actualHeight = getActualHeight(el);
         el.style.height = actualHeight + 'px';
     }
-    render() {
-        const handlers = {
-            onFocus: this.clearDefault,
-            onBlur: this.handleBlur
-        };
-        return (
-            <div className='text-editor-title'>
-                        <textarea
-                            className={this.state.teTitle === this.teTitleDefault ? 'text-editor-editor-default-text' : null}
-                            id='teTitle' name='title' value={this.state.teTitle} {...handlers}
-                            onChange={this.handleTitleChange}/>
-            </div>
-        )
-    }
-}
-
-class TePost extends  React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            tePost: 'Text (optional)',
-            bold: false,
-            italic: false,
-            spoiler: false,
-            strikethrough: false,
-            markdown: false,
-            preview: false,
-            selectionStart: null,
-            selectionEnd: null
-        };
-        this.tePostDefault = 'Text (optional)';
-        this.handlePostChange = this.handlePostChange.bind(this);
-        this.clearDefault = this.clearDefault.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
-        this.toggleButton = this.toggleButton.bind(this);
-        this.shortcutListener = this.shortcutListener.bind(this);
-    }
-    clearDefault(e) {
-        if (e.target.value === this.tePostDefault) {
-            this.setState({
-                tePost: ''
-            })
-        }
-    }
-    handleBlur(e) {
-        if (e.target.value === '') {
-            this.setState({
-                tePost: this.tePostDefault
-            })
-        }
-    }
     handlePostChange(e) {
         let content = e.target.value;
         let el = document.getElementById('tePost');
@@ -134,20 +116,11 @@ class TePost extends  React.Component {
     }
     renderPreview(content) {
         let preview = document.getElementById('tePreview');
-        let node;
-        let textnode;
+        let container = postParser(content);
         while (preview.firstChild) {
             preview.removeChild(preview.firstChild);
         }
-        content = JSON.stringify(content);
-        content = content.slice(1, content.length - 1);
-        content = content.split('\\n');
-        content.map((i) => {
-            node = document.createElement('p');
-            textnode = document.createTextNode(i);
-            node.appendChild(textnode);
-            preview.appendChild(node);
-        });
+        preview.appendChild(container);
     }
     toggleButton(buttonName) {
         let toggleButton = () => {
@@ -270,6 +243,38 @@ class TePost extends  React.Component {
             }
         }
     }
+    handleSubmit(e) {
+        e.preventDefault();
+        if (!this.props.isLogin) {
+            window.open('/login', 'iframe-s');
+            return
+        }
+        const data = {
+            username: this.props.username,
+            title: this.state.teTitle,
+            post: this.state.tePost
+        };
+        this.setState({isSubmitting: true});
+        fetch('/createpost', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            }
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '106') {
+                    this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+                } else if (json === '130') {
+                    this.setState({response: 'Submitted!'});
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+                this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+            });
+    }
     componentDidUpdate() {
         if (this.state.selectionStart || this.state.selectionEnd) {
             let el = document.getElementById('tePost');
@@ -292,6 +297,15 @@ class TePost extends  React.Component {
             onFocus: this.clearDefault,
             onBlur: this.handleBlur
         };
+        const titleProps = {
+            clearDefault: this.clearDefault,
+            handleBlur: this.handleBlur,
+            teTitle: this.state.teTitle,
+            teTitleDefault: this.teTitleDefault,
+            handleTitleChange: this.handleTitleChange,
+        };
+        const isValid= (this.state.teTitle !== this.teTitleDefault && this.state.teTitle !== '');
+        const buttonClassName = (isValid && !this.state.isSubmitting) ? 'text-editor-button' : 'text-editor-button text-editor-button-disabled';
 
         let markdownClassName;
         let previewClassName;
@@ -305,60 +319,50 @@ class TePost extends  React.Component {
             markdownClassName = this.state.tePost === this.tePostDefault ? 'text-editor-editor-default-text' : null;
             previewClassName = 'text-editor-preview';
         }
-
         return (
-            <div className='text-editor-editor-wrapper'>
-                <div className='text-editor-editor-toolbox-wrapper'>
-                    <div className='text-editor-editor-toolbox-left'>
-                        <ItemGenerator Icon={FiBold} label='bold (Ctrl+B)' toggleButton={this.toggleButton('bold')} isSelected={this.state.bold}/>
-                        <ItemGenerator Icon={FiItalic} label='italic (Ctrl+I)' toggleButton={this.toggleButton('italic')} isSelected={this.state.italic}/>
-                        <ItemGenerator Icon={FiEdit3} label='strikethrough (Ctrl+D)' toggleButton={this.toggleButton('strikethrough')} isSelected={this.state.strikethrough}/>
-                        <ItemGenerator Icon={FiAlertCircle} label='spoiler (Ctrl+S)' toggleButton={this.toggleButton('spoiler')} isSelected={this.state.spoiler}/>
-                        <ItemGenerator Icon={FiImage} label='add image' />
-                    </div>
-                    <div className='text-editor-editor-toolbox-center'>
-                        <ItemGenerator Icon={FiArrowDownRight} label='markdown' toggleButton={this.togglePreview('markdown')} isSelected={this.state.markdown}/>
-                        <ItemGenerator Icon={FiArrowDownLeft} label='preview' toggleButton={this.togglePreview('preview')} isSelected={this.state.preview}/>
-                    </div>
-                    <div className='text-editor-editor-toolbox-right'>
-                    </div>
-                </div>
-                <div className='text-editor-markdown-wrapper'>
+            <div className='text-editor-wrapper'>
+                <form onSubmit={this.handleSubmit}>
+
+                    <TeTitle {...titleProps}/>
+
+                    {/* POST */}
+                    <div className='text-editor-editor-wrapper'>
+                        <div className='text-editor-editor-toolbox-wrapper'>
+                            <div className='text-editor-editor-toolbox-left'>
+                                <ItemGenerator Icon={FiBold} label='bold (Ctrl+B)' toggleButton={this.toggleButton('bold')} isSelected={this.state.bold}/>
+                                <ItemGenerator Icon={FiItalic} label='italic (Ctrl+I)' toggleButton={this.toggleButton('italic')} isSelected={this.state.italic}/>
+                                <ItemGenerator Icon={FiEdit3} label='strikethrough (Ctrl+D)' toggleButton={this.toggleButton('strikethrough')} isSelected={this.state.strikethrough}/>
+                                <ItemGenerator Icon={FiAlertCircle} label='spoiler (Ctrl+S)' toggleButton={this.toggleButton('spoiler')} isSelected={this.state.spoiler}/>
+                                <ItemGenerator Icon={FiImage} label='add image' />
+                            </div>
+                            <div className='text-editor-editor-toolbox-center'>
+                                <ItemGenerator Icon={FiArrowDownRight} label='markdown' toggleButton={this.togglePreview('markdown')} isSelected={this.state.markdown}/>
+                                <ItemGenerator Icon={FiArrowDownLeft} label='preview' toggleButton={this.togglePreview('preview')} isSelected={this.state.preview}/>
+                            </div>
+                            <div className='text-editor-editor-toolbox-right'>
+                            </div>
+                        </div>
+                        <div className='text-editor-markdown-wrapper'>
                             <textarea className={markdownClassName}
                                       onChange={this.handlePostChange}
                                       id='tePost' name='post' value={this.state.tePost} {...handlers}/>
-                    <div className={previewClassName} id='tePreview'>
+                            <div className={previewClassName} id='tePreview'>
 
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        )
-    }
-}
+                    {/* POST END*/}
 
-class TextEditor extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
-
-    render() {
-        return (
-            <div className='text-editor-wrapper'>
-                <form>
-
-                    <TeTitle />
-                    <TePost />
-
-                    <div className='text-editor-button'>
-                        <button style={{backgroundColor: this.props.themeColor[0]}}>Post</button>
+                    <div className={buttonClassName}>
+                        <button style={{backgroundColor: this.props.themeColor[0]}} type='submit' disabled={!isValid}>Post</button>
                     </div>
+                    <p className='text-editor-response'>{ this.state.response }</p>
                 </form>
             </div>
         )
     }
 }
+
 
 // function for handleTitleChange & handlePostChange
 function getActualHeight(el) {
@@ -372,4 +376,4 @@ function getActualHeight(el) {
     return height;
 }
 
-export { TextEditor };
+export { PostTextEditor };

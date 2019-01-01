@@ -1,0 +1,28 @@
+.postparser-bold {
+     font-weight: bold;
+ }
+.postparser-spoiler {
+    background-color: rgba(0, 0, 0, 1);
+    color: rgba(0, 0, 0, 0);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.postparser-spoiler:hover::before {
+    content: 'Reveal spoiler';
+    position: absolute;
+    bottom: 110%;
+    background-color: black;
+    color: white;
+    font-size: 12px;
+    padding: 5px;
+    width: fit-content;
+    min-width: 10px;
+    border-radius: 2px;
+}
+.postparser-spoiler-revealed {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 1);
+    transition: 0.5s;
+}

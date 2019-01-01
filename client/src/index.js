@@ -26,7 +26,7 @@ class IFrameS extends React.Component{
     }
     handleChange() {
         const url = document.getElementById("iframe-s").contentWindow.location.href;
-        if (url === window.location.href) {
+        if (url.slice(url.length - 5, url.length) === 'close') {
             window.location.reload();
         } else {
             this.setState({isWorking: true});

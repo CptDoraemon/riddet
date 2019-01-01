@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './createpost.css';
 import { HeaderLite } from '../header';
-import { TextEditor } from './texteditor';
+import { PostTextEditor } from './texteditor';
 
 class Createpost extends React.Component {
     componentDidMount() {
@@ -28,7 +28,7 @@ class Createpost extends React.Component {
                         </ol>
                     </div>
                     <div className='createpost-content-text-editor'>
-                        <TextEditor themeColor={this.props.themeColor}/>
+                        <PostTextEditor themeColor={this.props.themeColor} isLogin={this.props.isLogin} username={this.props.user.username}/>
                     </div>
                 </div>
             </div>

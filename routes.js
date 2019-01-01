@@ -23,6 +23,7 @@ module.exports = function (app, db) {
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed
     // 120 logout success
+    // 130 create post success, 131 post invalid
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -132,6 +133,41 @@ module.exports = function (app, db) {
 
     app.get('/createpost', (req, res, next) => {
         req.isAuthenticated() ? next() : res.redirect('/');
+    });
+
+    app.post('/createpost', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        if (req.body.title === '' || req.body.title === 'Title (required)') {
+            res.json('131');
+            return
+        }
+        const date = new Date();
+        db.collection('posts').insertOne({
+            username: req.body.username,
+            title: req.body.title,
+            post: req.body.post,
+            date: date
+        }, (err, post) => {
+            if (err) {
+                console.log(err);
+                res.json('106');
+            } else {
+                res.json('130');
+            }
+        })
+    });
+    app.get('/getNewPost', (req, res) => {
+        let data;
+        (async function() {
+            try {
+                data = await db.collection('posts').find().sort({date: -1}).limit(5).toArray();
+                res.json(data);
+            } catch (err) {
+                console.log(err);
+                res.json('106');
+            }
+        })();
     });
 
     app.get('*', (req, res) => {

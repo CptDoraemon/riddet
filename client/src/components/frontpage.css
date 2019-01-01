@@ -1,7 +1,8 @@
 .frontpage-wrapper {
     width: 100%;
-    min-height: 2000px;
+    min-height: 1000px;
     background-color: rgb(219, 224, 229);
+    padding-bottom: 100px;
 }
 
 .main-content-wrapper {
@@ -21,6 +22,10 @@
 .posts-wrapper {
     width: 660px;
     height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 .infos-wrapper {
     width: 300px;
