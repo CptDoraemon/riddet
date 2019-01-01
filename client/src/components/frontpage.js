@@ -4,7 +4,7 @@ import './frontpage.css';
 import { HeaderMax } from './header';
 import { Card } from './card';
 import { Info } from './info';
-import { Loading, LoadingFailed } from "./tools/loading";
+import { Loading, LoadingFailed, NoMoreLoad } from "./tools/loading";
 
 function Cards (props) {
     const data = props.postData;
@@ -23,7 +23,8 @@ class Frontpage extends React.Component {
             sort: 'hot',
             loadingPost: true,
             loadingPostSuccess: true,
-            postData: []
+            postData: [],
+            noMorePost: false,
         };
         this.loadingRef = React.createRef();
         this.toggleView = this.toggleView.bind(this);
@@ -41,9 +42,16 @@ class Frontpage extends React.Component {
         })
     }
     requestPosts() {
+        if (this.state.noMorePost) return;
         this.setState({loadingPost: true, loadingPostSuccess: true});
+        let oldestPost = this.state.postData.length === 0 ? null : this.state.postData[this.state.postData.length - 1].date;
+        oldestPost = {oldestPost: oldestPost};
         fetch('/getNewPost', {
-            method: 'GET'
+            method: 'POST',
+            body: JSON.stringify(oldestPost),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            }
         })
             .then(res => res.json())
             .then(json => {
@@ -54,6 +62,9 @@ class Frontpage extends React.Component {
                     loadingPost: false,
                     loadingPostSuccess: true
                 });
+                if (json.length < 5) {
+                    this.setState({noMorePost: true})
+                }
             })
             .catch((err) => {
                 this.setState({loadingPost: false, loadingPostSuccess: false});
@@ -88,6 +99,7 @@ class Frontpage extends React.Component {
                             { this.state.loadingPost ? <Loading /> : null }
                             { this.state.loadingPostSuccess ? null : <LoadingFailed/> }
                             <div ref={this.loadingRef} />
+                            { this.state.noMorePost ? <NoMoreLoad /> : null }
                         </div>
                         <div className='infos-wrapper'>
                             <Info {...this.props} />

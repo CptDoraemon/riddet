@@ -24,6 +24,7 @@ module.exports = function (app, db) {
     // 110 login success; 111 login failed
     // 120 logout success
     // 130 create post success, 131 post invalid
+    // 140 no more new posts
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -157,12 +158,17 @@ module.exports = function (app, db) {
             }
         })
     });
-    app.get('/getNewPost', (req, res) => {
+    app.post('/getNewPost', (req, res) => {
         let data;
+        let oldestPost = req.body.oldestPost;
+        const date = new Date(oldestPost);
+
         (async function() {
             try {
-                data = await db.collection('posts').find().sort({date: -1}).limit(5).toArray();
-                res.json(data);
+                data = oldestPost === null ?
+                    await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
+                    await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray() ;
+                    res.json(data);
             } catch (err) {
                 console.log(err);
                 res.json('106');

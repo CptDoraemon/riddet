@@ -245,6 +245,7 @@ class PostTextEditor extends  React.Component {
     }
     handleSubmit(e) {
         e.preventDefault();
+        console.log('submitted');
         if (!this.props.isLogin) {
             window.open('/login', 'iframe-s');
             return
@@ -264,7 +265,7 @@ class PostTextEditor extends  React.Component {
         })
             .then(res => res.json())
             .then(json => {
-                if (json === '106') {
+                if (json === '106' || json === '131') {
                     this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
                 } else if (json === '130') {
                     this.setState({response: 'Submitted!'});
@@ -304,8 +305,8 @@ class PostTextEditor extends  React.Component {
             teTitleDefault: this.teTitleDefault,
             handleTitleChange: this.handleTitleChange,
         };
-        const isValid= (this.state.teTitle !== this.teTitleDefault && this.state.teTitle !== '');
-        const buttonClassName = (isValid && !this.state.isSubmitting) ? 'text-editor-button' : 'text-editor-button text-editor-button-disabled';
+        const isValid= (this.state.teTitle !== this.teTitleDefault && this.state.teTitle !== '' && !this.state.isSubmitting);
+        const buttonClassName = (isValid) ? 'text-editor-button' : 'text-editor-button text-editor-button-disabled';
 
         let markdownClassName;
         let previewClassName;
