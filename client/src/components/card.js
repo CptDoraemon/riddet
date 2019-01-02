@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import './card.css';
 import {Vote} from './buttons/cardButtons';
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdHighlightOff, MdFlag } from "react-icons/md";
+import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag } from "react-icons/md";
 
 
 class Card extends React.Component {
@@ -59,7 +59,6 @@ class Card extends React.Component {
             data.isUpVoted,
             data.isDownVoted,
         ];
-        console.log(upVotes, downVotes);
 
         // date calculations
         const postDate = new Date(date);
@@ -116,7 +115,7 @@ class Card extends React.Component {
                             <span>share</span>
                         </div>
                         <div className='card-body-bottombar-item'>
-                            <MdBookmark size='20px'/>
+                            <MdBookmarkBorder size='20px'/>
                             <span>save</span>
                         </div>
                         <div className='card-body-bottombar-item'>

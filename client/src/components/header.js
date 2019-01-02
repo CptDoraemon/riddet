@@ -116,7 +116,8 @@ class HeaderFixedUser extends React.Component{
     }
     logout() {
         fetch('/logout', {
-            method: 'GET'
+            method: 'GET',
+            credentials: "same-origin"
         }).then(res => res.json())
             .then(json => {
                 if (json === '120') {

@@ -261,7 +261,8 @@ class PostTextEditor extends  React.Component {
             body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-            }
+            },
+            credentials: "same-origin"
         })
             .then(res => res.json())
             .then(json => {

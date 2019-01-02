@@ -52,7 +52,8 @@ class Frontpage extends React.Component {
             body: JSON.stringify(oldestPost),
             headers:{
                 'Content-Type': 'application/json; charset=utf-8',
-            }
+            },
+            credentials: "same-origin"
         })
             .then(res => res.json())
             .then(json => {

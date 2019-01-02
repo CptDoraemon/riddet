@@ -69,7 +69,9 @@ class Index extends React.Component {
             method: 'GET',
             headers:{
                 'Content-Type': 'application/json; charset=utf-8',
-            }}
+            },
+            credentials: "same-origin"
+            }
         ).then(res => res.json())
             .then(json => {
                 if (json.code === '110') this.setState({ isLogin: true, user: {...this.state.user, username: json.username} });

@@ -5,12 +5,6 @@ const path = require('path');
 const ObjectId = require('mongodb').ObjectID;
 
 module.exports = function (app, db) {
-    function ensureAuthenticated(req, res, next) {
-        if (req.isAuthenticated()) {
-            return next();
-        }
-        res.redirect('/');
-    }
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -113,7 +107,7 @@ module.exports = function (app, db) {
                                         successRedirect: '/loginSuccess' })
     );
 
-    app.get('/loginSuccess', (req, res) => {
+    app.get('/loginSuccess', (req, res, next) => {
         res.json({code: '110', username: req.user.username})
     });
     app.get('/loginFailed', (req, res) => {
@@ -122,7 +116,6 @@ module.exports = function (app, db) {
 
     app.post('/login',
         passport.authenticate('local', { failureRedirect: '/loginFailed', successRedirect: '/loginSuccess' })
-
     );
 
     app.get('/verifyAuthentication', (req, res) => {

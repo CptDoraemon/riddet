@@ -27,9 +27,10 @@ class Login extends React.Component {
         fetch('/login', {
             method: 'POST',
             body: JSON.stringify(data),
-            headers:{
+            headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-            }
+            },
+            credentials: "same-origin"
         }).then(res => res.json())
             .then(json => {
                 if (json.code === '111') {
@@ -43,7 +44,7 @@ class Login extends React.Component {
                 }
             }).catch((err) => {
                 this.setState({
-                    error: err
+                    error: 'Something unexpected happened, please try again.'
                 })
         })
     }
