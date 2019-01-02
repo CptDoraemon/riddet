@@ -16,11 +16,12 @@
     width: 1000px;
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     align-items: flex-start;
 }
 .posts-wrapper {
     width: 660px;
+    margin: 0 20px;
     height: auto;
     display: flex;
     flex-direction: column;

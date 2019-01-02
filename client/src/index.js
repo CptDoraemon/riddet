@@ -12,7 +12,6 @@ import { IoIosBonfire, IoIosClose } from "react-icons/io";
 import { Frontpage } from './components/frontpage';
 import { Login } from './components/forms/login';
 import { Signup } from './components/forms/signup';
-import { Welcome } from './components/forms/welcome';
 import { Createpost } from './components/createpost/createpost';
 
 class IFrameS extends React.Component{
@@ -26,8 +25,11 @@ class IFrameS extends React.Component{
     }
     handleChange() {
         const url = document.getElementById("iframe-s").contentWindow.location.href;
+        console.log(url);
         if (url.slice(url.length - 5, url.length) === 'close') {
             window.location.reload();
+        } else if (url === 'about:blank') {
+
         } else {
             this.setState({isWorking: true});
             document.body.style.overflow = 'hidden';
