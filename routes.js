@@ -2,6 +2,7 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const path = require('path');
+const ObjectId = require('mongodb').ObjectID;
 
 module.exports = function (app, db) {
     function ensureAuthenticated(req, res, next) {
@@ -25,6 +26,7 @@ module.exports = function (app, db) {
     // 120 logout success
     // 130 create post success, 131 post invalid
     // 140 no more new posts
+    // 150 vote success, 151 vote failed
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -158,20 +160,94 @@ module.exports = function (app, db) {
             }
         })
     });
-    app.post('/getNewPost', (req, res) => {
-        let data;
-        let oldestPost = req.body.oldestPost;
-        const date = new Date(oldestPost);
+    app.post('/getNewPost', (req, res, next) => {
+        req.isAuthenticated();
+        next();
+        }, (req, res) => {
+            const userId = req.user ? req.user._id.toString() : null;
+            let data;
+            let oldestPost = req.body.oldestPost;
+            const date = new Date(oldestPost);
 
+            (async function() {
+                try {
+                    const data = oldestPost === null ?
+                        await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
+                        await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray() ;
+                    // add isUpVoted / isDownVoted if logged in
+                    data.map((i) => {
+                        i.isUpVoted = false;
+                        i.isDownVoted = false;
+                    });
+                    if (userId !== null) {
+                        data.map((i) => {
+                            if (i.upVotes) {
+                                if (i.upVotes.indexOf(userId) !== -1) i.isUpVoted = true;
+                            }
+                            if (i.downVotes) {
+                                if (i.downVotes.indexOf(userId) !== -1) i.isDownVoted = true;
+                            }
+                        });
+                    }
+                    res.json(data);
+                } catch (err) {
+                    console.log(err);
+                    res.json('106');
+                }
+            })();
+        }
+    );
+
+    app.post('/upvote', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const postId = ObjectId(req.body.id);
+        const userId = req.user._id.toString();
+        const isCancel = req.body.isCancel;
         (async function() {
             try {
-                data = oldestPost === null ?
-                    await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
-                    await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray() ;
-                    res.json(data);
+                let upVotes = await db.collection('posts').findOne({_id: postId});
+                let upVotesArray =  upVotes.upVotes ? upVotes.upVotes.slice() : [];
+                const index =  upVotesArray.indexOf(userId);
+                // cancel existing vote
+                if (isCancel) {
+                    if (index !== -1) upVotesArray.splice(index, 1);
+                } else {
+                    // new vote
+                    if (index === -1) upVotesArray.push(userId);
+                }
+                await db.collection('posts').updateOne({_id: postId}, {$set: {upVotes: upVotesArray}});
+                res.json('150');
             } catch (err) {
                 console.log(err);
-                res.json('106');
+                res.json('151');
+            }
+        })();
+    });
+
+    app.post('/downvote', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const postId = ObjectId(req.body.id);
+        const userId = req.user._id.toString();
+        const isCancel = req.body.isCancel;
+        (async function() {
+            try {
+                let downVotes = await db.collection('posts').findOne({_id: postId});
+                let downVotesArray =  downVotes.downVotes ? downVotes.downVotes.slice() : [];
+                const index =  downVotesArray.indexOf(userId);
+                // cancel existing vote
+                if (isCancel) {
+                    if (index !== -1) downVotesArray.splice(index, 1);
+                } else {
+                    // new vote
+                    if (index === -1) downVotesArray.push(userId);
+                }
+                await db.collection('posts').updateOne({_id: postId}, {$set: {downVotes: downVotesArray}});
+                res.json('150');
+            } catch (err) {
+                console.log(err);
+                res.json('151');
             }
         })();
     });

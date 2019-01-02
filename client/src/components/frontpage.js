@@ -9,7 +9,8 @@ import { Loading, LoadingFailed, NoMoreLoad } from "./tools/loading";
 function Cards (props) {
     const data = props.postData;
     if (data.length !== 0) {
-        let posts = data.map((i) => <Card username={i.username} title={i.title} post={i.post} date={i.date} />);
+        // i is posts objects
+        let posts = data.map((i) => <Card key={i._id} data={{...i}} />);
         return posts
     } else {
         return null

@@ -30,12 +30,21 @@
 .card-sidebar-voteup:hover {
     color: red;
 }
+.card-sidebar-voteup-voted {
+    color: red;
+    cursor: pointer;
+    padding-top: 20px;
+}
 .card-sidebar-votedown {
     color: grey;
     cursor: pointer;
 }
 .card-sidebar-votedown:hover {
     color: blue;
+}
+.card-sidebar-votedown-voted {
+    color: blue;
+    cursor: pointer;
 }
 .card-sidebar-count {
     font-size: 14px;

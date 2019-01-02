@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 import './card.css';
-
+import {Vote} from './buttons/cardButtons';
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
 import { MdComment, MdShare, MdBookmark, MdHighlightOff, MdFlag } from "react-icons/md";
 
@@ -12,9 +12,10 @@ class Card extends React.Component {
         super(props);
         this.state = {
             contentIsMaxHeight: false,
-            unfold: false
+            unfold: false,
         };
         this.contentRef = React.createRef();
+        this.changeVote = this.changeVote.bind(this);
     }
     unfold() {
         this.setState({
@@ -33,7 +34,35 @@ class Card extends React.Component {
         }
     }
     render() {
-        const postDate = new Date(this.props.date);
+
+        // data
+        const data = this.props.data;
+        const [
+            username,
+            title,
+            post,
+            date,
+            comments,
+            upVotes,
+            downVotes,
+            id,
+            isUpVoted,
+            isDownVoted // By current login user
+        ] = [
+            data.username,
+            data.title,
+            data.post,
+            data.date,
+            data.comments ? data.comments.length : 0,
+            data.upVotes ? data.upVotes.length : 0,
+            data.downVotes ? data.downVotes.length : 0,
+            data._id,
+            data.isUpVoted,
+            data.isDownVoted,
+        ];
+
+        // date calculations
+        const postDate = new Date(date);
         const nowDate = new Date();
         let dateDiff = Math.floor((nowDate - postDate) / (1000 * 60)); //minute
         let dateDiffMessage = dateDiff + ' minutes ago';
@@ -46,25 +75,24 @@ class Card extends React.Component {
             }
         }
 
+        // vote ClassName
+        const voteClassName = {
+            up: ['card-sidebar-voteup', 'card-sidebar-voteup-voted'],
+            count: 'card-sidebar-count',
+            down: ['card-sidebar-votedown', 'card-sidebar-votedown-voted']
+        };
 
         return (
             <div className='card-wrapper'>
                 <div className='card-sidebar'>
-                    <div className='card-sidebar-voteup'>
-                        <GoArrowUp size='25px'/>
-                    </div>
-                    <div className='card-sidebar-count'>
-                        6
-                    </div>
-                    <div className='card-sidebar-votedown'>
-                        <GoArrowDown size='25px'/>
-                    </div>
+
+                    <Vote className={...voteClassName} isUpVoted={this.state.isUpVoted} isDownVoted={this.state.isDownVoted} id={id} count={upVotes - downVotes}/>
 
                 </div>
                 <div className='card-body'>
                     <div className='card-body-info'>
                         <p>Posted by
-                            <span> u/{this.props.username}</span>
+                            <span> u/{username}</span>
                             <span> {dateDiffMessage}</span>
                         </p>
                     </div>
@@ -72,8 +100,8 @@ class Card extends React.Component {
                         className={this.state.unfold ? 'card-body-content card-body-content-unfold' : 'card-body-content' }
                         ref={this.contentRef}
                     >
-                        <h3> { this.props.title } </h3>
-                        <p> { this.props.post }</p>
+                        <h3> { title } </h3>
+                        <p> { post }</p>
                     </div>
                     <div className='card-body-content-maxheight-placeholder'>
                         <span onClick={this.unfold.bind(this)}> {this.state.contentIsMaxHeight && !this.state.unfold ? '... click to unfold ...' : null} </span>
