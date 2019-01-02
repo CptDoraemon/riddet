@@ -15,7 +15,6 @@ class Card extends React.Component {
             unfold: false,
         };
         this.contentRef = React.createRef();
-        this.changeVote = this.changeVote.bind(this);
     }
     unfold() {
         this.setState({
@@ -60,6 +59,7 @@ class Card extends React.Component {
             data.isUpVoted,
             data.isDownVoted,
         ];
+        console.log(upVotes, downVotes);
 
         // date calculations
         const postDate = new Date(date);
@@ -86,7 +86,7 @@ class Card extends React.Component {
             <div className='card-wrapper'>
                 <div className='card-sidebar'>
 
-                    <Vote className={...voteClassName} isUpVoted={this.state.isUpVoted} isDownVoted={this.state.isDownVoted} id={id} count={upVotes - downVotes}/>
+                    <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted} id={id} count={upVotes - downVotes}/>
 
                 </div>
                 <div className='card-body'>
