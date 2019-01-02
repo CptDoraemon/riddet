@@ -98,13 +98,17 @@ class Card extends React.Component {
         const postDate = new Date(date);
         const nowDate = new Date();
         let dateDiff = Math.floor((nowDate - postDate) / (1000 * 60)); //minute
-        let dateDiffMessage = dateDiff + ' minutes ago';
+        let dateDiffMessage;
+        dateDiffMessage = dateDiff === 1 ? ' minute ago' : ' minutes ago';
+        dateDiffMessage = dateDiff + dateDiffMessage;
         if (dateDiff >= 60) {
             dateDiff = Math.floor(dateDiff / 60); //hour
-            dateDiffMessage = dateDiff + ' hours ago';
+            dateDiffMessage = dateDiff === 1 ? ' hour ago' : ' hours ago';
+            dateDiffMessage = dateDiff + dateDiffMessage;
             if (dateDiff >= 24) {
                 dateDiff = Math.floor(dateDiff / 24); //day
-                dateDiffMessage = dateDiff + ' days ago';
+                dateDiffMessage = dateDiff === 1 ? ' day ago' : ' days ago';
+                dateDiffMessage = dateDiff + dateDiffMessage;
             }
         }
 

@@ -160,13 +160,13 @@ module.exports = function (app, db) {
             const userId = req.user ? req.user._id.toString() : null;
             let data;
             let oldestPost = req.body.oldestPost;
-            const date = new Date(oldestPost);
+            let date = new Date(oldestPost);
 
             (async function() {
                 try {
-                    const data = oldestPost === null ?
+                    let data = oldestPost === null ?
                         await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
-                        await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray() ;
+                        await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray();
                     // add isUpVoted / isDownVoted if logged in
                     data.map((i) => {
                         i.isUpVoted = false;
@@ -182,19 +182,30 @@ module.exports = function (app, db) {
                             }
                         });
                     }
-                    // add issaved if logged in
+                    // add isSaved if logged in
                     data.map((i) => i.isSaved = false);
                     if (userId !== null && req.user.savedPosts) {
                         data.map((i) => req.user.savedPosts.indexOf(i._id.toString()) === -1 ? null : i.isSaved = true);
                     }
                     // hide hidden posts if logged in
+                    let dataExcludesHiddenPosts = [];
                     if (userId !== null && req.user.hiddenPosts) {
-                        data.map((i, index) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? null : data.splice(index, 1));
+                        data.map((i) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? dataExcludesHiddenPosts.push(i) : null);
+                        //if all the new post got is hidden
+                        while (dataExcludesHiddenPosts.length === 0 && data.length !== 0) {
+                            oldestPost = data[data.length - 1].date;
+                            date = new Date(oldestPost);
+                            data = await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray();
+                            data.map((i) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? dataExcludesHiddenPosts.push(i) : null);
+                        }
+                    } else {
+                        dataExcludesHiddenPosts = [...data]
                     }
 
-
                     //
-                    res.json(data);
+                    dataExcludesHiddenPosts.length === 0 ?
+                        res.json('140') :
+                        res.json(dataExcludesHiddenPosts);
                 } catch (err) {
                     console.log(err);
                     res.json('106');

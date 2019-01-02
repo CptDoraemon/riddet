@@ -58,15 +58,17 @@ class Frontpage extends React.Component {
             .then(res => res.json())
             .then(json => {
                 let postData = [...this.state.postData];
-                json.map((i) => postData.push(i));
+                if (json === '140') {
+                    //no more posts
+                    this.setState({noMorePost: true})
+                } else {
+                    json.map((i) => postData.push(i));
+                }
                 this.setState({
                     postData: postData,
                     loadingPost: false,
                     loadingPostSuccess: true
                 });
-                if (json.length < 5) {
-                    this.setState({noMorePost: true})
-                }
             })
             .catch((err) => {
                 this.setState({loadingPost: false, loadingPostSuccess: false});
