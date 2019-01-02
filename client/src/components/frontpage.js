@@ -76,7 +76,6 @@ class Frontpage extends React.Component {
     loadMore() {
         const scrolledBottom = window.scrollY + window.innerHeight;
         const height = this.loadingRef.current.offsetTop;
-        console.log(height, scrolledBottom);
         if (scrolledBottom > height && !this.state.loadingPost) {
             this.requestPosts()
         }

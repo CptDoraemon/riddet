@@ -2,9 +2,9 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 import './card.css';
-import {Vote} from './buttons/cardButtons';
-import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag } from "react-icons/md";
+import { Vote, Save } from './buttons/cardButtons';
+import { MdComment, MdShare, MdHighlightOff, MdFlag } from "react-icons/md";
+import { PostParser } from "./createpost/postparser";
 
 
 class Card extends React.Component {
@@ -13,14 +13,46 @@ class Card extends React.Component {
         this.state = {
             contentIsMaxHeight: false,
             unfold: false,
+            isHidden: false,
+            isHiding: false
         };
         this.contentRef = React.createRef();
+        this.handleHide = this.handleHide.bind(this);
+        this.postId = this.props.data._id;
     }
     unfold() {
         this.setState({
             unfold: true
         })
     }
+    handleHide(e) {
+        e.preventDefault();
+        if (this.state.isHiding) return;
+
+        fetch('/hidepost', {
+            method: 'POST',
+            body: JSON.stringify({id: this.postId}),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.open('/login', 'iframe-s');
+                    this.setState({isHiding: false});
+                } else if (json === '154') {
+                    // success
+                    this.setState({isHiding: false, isHidden: true});
+                } else {
+                    // failed
+                    this.setState({isHiding: false});
+                }
+            })
+            .catch(err => this.setState({isHiding: false}));
+    };
+
     componentDidMount() {
         this.setState({
             contentIsMaxHeight: false,
@@ -44,9 +76,10 @@ class Card extends React.Component {
             comments,
             upVotes,
             downVotes,
-            id,
+            postId,
             isUpVoted,
-            isDownVoted // By current login user
+            isDownVoted, // By current login user
+            isSaved
         ] = [
             data.username,
             data.title,
@@ -58,6 +91,7 @@ class Card extends React.Component {
             data._id,
             data.isUpVoted,
             data.isDownVoted,
+            data.isSaved
         ];
 
         // date calculations
@@ -81,54 +115,56 @@ class Card extends React.Component {
             down: ['card-sidebar-votedown', 'card-sidebar-votedown-voted']
         };
 
+        if (this.state.isHidden) return null;
         return (
-            <div className='card-wrapper'>
-                <div className='card-sidebar'>
+                <div className='card-wrapper'>
+                    <div className='card-sidebar'>
 
-                    <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted} id={id} count={upVotes - downVotes}/>
+                        <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted}
+                              postId={postId} count={upVotes - downVotes}/>
 
+                    </div>
+                    <div className='card-body'>
+                        <div className='card-body-info'>
+                            <p>Posted by
+                                <span> u/{username}</span>
+                                <span> {dateDiffMessage}</span>
+                            </p>
+                        </div>
+                        <div
+                            className={this.state.unfold ? 'card-body-content card-body-content-unfold' : 'card-body-content'}
+                            ref={this.contentRef}
+                        >
+                            <h3> {title} </h3>
+                            <PostParser post={post}/>
+                        </div>
+                        <div className='card-body-content-maxheight-placeholder'>
+                            <span
+                                onClick={this.unfold.bind(this)}> {this.state.contentIsMaxHeight && !this.state.unfold ? '... click to unfold ...' : null} </span>
+                        </div>
+                        <div className='card-body-bottombar'>
+                            <div className='card-body-bottombar-item'>
+                                <MdComment size='20px'/>
+                                <span>comments</span>
+                            </div>
+                            <div className='card-body-bottombar-item'>
+                                <MdShare size='20px'/>
+                                <span>share</span>
+                            </div>
+
+                            <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId}/>
+
+                            <div className='card-body-bottombar-item' onClick={this.handleHide}>
+                                <MdHighlightOff size='20px'/>
+                                <span>hide</span>
+                            </div>
+                            <div className='card-body-bottombar-item'>
+                                <MdFlag size='20px'/>
+                                <span>report</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className='card-body'>
-                    <div className='card-body-info'>
-                        <p>Posted by
-                            <span> u/{username}</span>
-                            <span> {dateDiffMessage}</span>
-                        </p>
-                    </div>
-                    <div
-                        className={this.state.unfold ? 'card-body-content card-body-content-unfold' : 'card-body-content' }
-                        ref={this.contentRef}
-                    >
-                        <h3> { title } </h3>
-                        <p> { post }</p>
-                    </div>
-                    <div className='card-body-content-maxheight-placeholder'>
-                        <span onClick={this.unfold.bind(this)}> {this.state.contentIsMaxHeight && !this.state.unfold ? '... click to unfold ...' : null} </span>
-                    </div>
-                    <div className='card-body-bottombar'>
-                        <div className='card-body-bottombar-item'>
-                            <MdComment size='20px'/>
-                            <span>comments</span>
-                        </div>
-                        <div className='card-body-bottombar-item'>
-                            <MdShare size='20px'/>
-                            <span>share</span>
-                        </div>
-                        <div className='card-body-bottombar-item'>
-                            <MdBookmarkBorder size='20px'/>
-                            <span>save</span>
-                        </div>
-                        <div className='card-body-bottombar-item'>
-                            <MdHighlightOff size='20px'/>
-                            <span>hide</span>
-                        </div>
-                        <div className='card-body-bottombar-item'>
-                            <MdFlag size='20px'/>
-                            <span>report</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         )
     }
 }

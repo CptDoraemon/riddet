@@ -2,7 +2,7 @@ import React from 'react';
 import './texteditor.css';
 import { FiBold, FiItalic, FiAlertCircle, FiEdit3, FiImage, FiArrowDownLeft, FiArrowDownRight } from "react-icons/fi";
 import './postparser.css';
-const postParser = require('./postparser.js');
+import { PostParser } from './postparser';
 
 class ItemGenerator extends React.Component {
     constructor(props) {
@@ -112,15 +112,6 @@ class PostTextEditor extends  React.Component {
         let setHeight = Math.max(actualHeight, previewHeight);
         el.style.height = setHeight + 'px';
         preview.style.height = setHeight + 'px';
-        this.renderPreview(content);
-    }
-    renderPreview(content) {
-        let preview = document.getElementById('tePreview');
-        let container = postParser(content);
-        while (preview.firstChild) {
-            preview.removeChild(preview.firstChild);
-        }
-        preview.appendChild(container);
     }
     toggleButton(buttonName) {
         let toggleButton = () => {
@@ -349,7 +340,7 @@ class PostTextEditor extends  React.Component {
                                       onChange={this.handlePostChange}
                                       id='tePost' name='post' value={this.state.tePost} {...handlers}/>
                             <div className={previewClassName} id='tePreview'>
-
+                                <PostParser post={this.state.tePost} />
                             </div>
                         </div>
                     </div>

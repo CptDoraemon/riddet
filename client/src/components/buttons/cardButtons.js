@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdHighlightOff, MdFlag } from "react-icons/md";
+import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag } from "react-icons/md";
 
 class Vote extends React.Component {
     // it receives props type = 'up' || 'down'
@@ -65,7 +65,7 @@ class Vote extends React.Component {
         };
         fetch(link, {
             method: 'POST',
-            body: JSON.stringify({id: this.props.id, isCancel: isCancel}),
+            body: JSON.stringify({id: this.props.postId, isCancel: isCancel}),
             headers:{
                 'Content-Type': 'application/json; charset=utf-8',
             },
@@ -113,6 +113,59 @@ class Vote extends React.Component {
     }
 }
 
+class Save extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isSaved: this.props.isSaved,
+            isSaving: false
+        };
+        this.handleClick = this.handleClick.bind(this);
+    }
+    handleClick(e) {
+        e.preventDefault();
+        if (this.state.isSaving) return;
+
+        const successAction = () => {
+            this.setState({isSaving: false, isSaved: !this.state.isSaved});
+        };
+        const failedAction = () => {
+            this.setState({isSaving: false})
+        };
+        this.setState({isSaving: true});
+        fetch('/savepost', {
+            method: 'POST',
+            body: JSON.stringify({id: this.props.postId, isCancel: this.state.isSaved}),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.open('/login', 'iframe-s');
+                    failedAction();
+                } else if (json === '152') {
+                    // success
+                    successAction();
+                } else {
+                    // failed
+                    failedAction();
+                }
+            })
+            .catch(err => failedAction());
+    }
+    render() {
+        return (
+            <div className={this.props.className} onClick={this.handleClick}>
+                { this.state.isSaved ? <MdBookmark size='20px'/> : <MdBookmarkBorder size='20px'/> }
+                { this.state.isSaved ? <span>saved</span> : <span>save</span> }
+            </div>
+        )
+    }
+}
 
 
-export { Vote };
+
+export { Vote, Save };

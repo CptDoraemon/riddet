@@ -20,7 +20,7 @@ module.exports = function (app, db) {
     // 120 logout success
     // 130 create post success, 131 post invalid
     // 140 no more new posts
-    // 150 vote success, 151 vote failed
+    // 150 vote success, 151 vote failed, 152 save success, 153 save failed, 154 hide success, 155 hide failed
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -182,6 +182,18 @@ module.exports = function (app, db) {
                             }
                         });
                     }
+                    // add issaved if logged in
+                    data.map((i) => i.isSaved = false);
+                    if (userId !== null && req.user.savedPosts) {
+                        data.map((i) => req.user.savedPosts.indexOf(i._id.toString()) === -1 ? null : i.isSaved = true);
+                    }
+                    // hide hidden posts if logged in
+                    if (userId !== null && req.user.hiddenPosts) {
+                        data.map((i, index) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? null : data.splice(index, 1));
+                    }
+
+
+                    //
                     res.json(data);
                 } catch (err) {
                     console.log(err);
@@ -241,6 +253,51 @@ module.exports = function (app, db) {
             } catch (err) {
                 console.log(err);
                 res.json('151');
+            }
+        })();
+    });
+
+    app.post('/savepost', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const postId = req.body.id.toString();
+        const userId = req.user._id;
+        const isCancel = req.body.isCancel;
+        (async function() {
+            try {
+                let savedPosts = req.user.savedPosts ? req.user.savedPosts.slice() : [];
+                const index =  savedPosts.indexOf(postId);
+                if (isCancel) {
+                    // cancel existing save
+                    if (index !== -1) savedPosts.splice(index, 1)
+                } else {
+                    // add new save post
+                    if (index === -1) savedPosts.push(postId);
+                }
+                await db.collection('users').updateOne({_id: userId}, {$set: {savedPosts : savedPosts}});
+                res.json('152');
+            } catch (err) {
+                console.log(err);
+                res.json('153');
+            }
+        })();
+    });
+
+    app.post('/hidepost', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const postId = req.body.id.toString();
+        const userId = req.user._id;
+        (async function() {
+            try {
+                let hiddenPosts = req.user.hiddenPosts ? req.user.hiddenPosts.slice() : [];
+                const index =  hiddenPosts.indexOf(postId);
+                if (index === -1) hiddenPosts.push(postId);
+                await db.collection('users').updateOne({_id: userId}, {$set: {hiddenPosts : hiddenPosts}});
+                res.json('154');
+            } catch (err) {
+                console.log(err);
+                res.json('155');
             }
         })();
     });

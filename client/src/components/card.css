@@ -28,10 +28,10 @@
     padding-top: 20px;
 }
 .card-sidebar-voteup:hover {
-    color: red;
+    color: rgb(255, 47, 25);
 }
 .card-sidebar-voteup-voted {
-    color: red;
+    color: rgb(255, 47, 25);
     cursor: pointer;
     padding-top: 20px;
 }
@@ -40,10 +40,10 @@
     cursor: pointer;
 }
 .card-sidebar-votedown:hover {
-    color: blue;
+    color: rgb(54, 121, 204);
 }
 .card-sidebar-votedown-voted {
-    color: blue;
+    color: rgb(54, 121, 204);
     cursor: pointer;
 }
 .card-sidebar-count {
