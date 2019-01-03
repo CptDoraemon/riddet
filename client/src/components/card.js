@@ -2,8 +2,8 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 import './card.css';
-import { Vote, Save } from './buttons/cardButtons';
-import { MdComment, MdShare, MdHighlightOff, MdFlag } from "react-icons/md";
+import { Vote, Save, HideAndReport } from './buttons/cardButtons';
+import { MdComment, MdShare, MdEdit } from "react-icons/md";
 import { PostParser } from "./createpost/postparser";
 
 
@@ -52,6 +52,9 @@ class Card extends React.Component {
             })
             .catch(err => this.setState({isHiding: false}));
     };
+    handleReport() {
+
+    }
 
     componentDidMount() {
         this.setState({
@@ -79,7 +82,8 @@ class Card extends React.Component {
             postId,
             isUpVoted,
             isDownVoted, // By current login user
-            isSaved
+            isSaved,
+            isEditable
         ] = [
             data.username,
             data.title,
@@ -91,7 +95,8 @@ class Card extends React.Component {
             data._id,
             data.isUpVoted,
             data.isDownVoted,
-            data.isSaved
+            data.isSaved,
+            data.isEditable
         ];
 
         // date calculations
@@ -118,6 +123,9 @@ class Card extends React.Component {
             count: 'card-sidebar-count',
             down: ['card-sidebar-votedown', 'card-sidebar-votedown-voted']
         };
+
+        // Button size
+        const buttonSize = '20px';
 
         if (this.state.isHidden) return null;
         return (
@@ -148,24 +156,24 @@ class Card extends React.Component {
                         </div>
                         <div className='card-body-bottombar'>
                             <div className='card-body-bottombar-item'>
-                                <MdComment size='20px'/>
+                                <MdComment size={buttonSize}/>
                                 <span>comments</span>
                             </div>
                             <div className='card-body-bottombar-item'>
-                                <MdShare size='20px'/>
+                                <MdShare size={buttonSize}/>
                                 <span>share</span>
                             </div>
 
-                            <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId}/>
+                            <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId} size={buttonSize}/>
 
-                            <div className='card-body-bottombar-item' onClick={this.handleHide}>
-                                <MdHighlightOff size='20px'/>
-                                <span>hide</span>
-                            </div>
+                            { isEditable ?
                             <div className='card-body-bottombar-item'>
-                                <MdFlag size='20px'/>
-                                <span>report</span>
-                            </div>
+                                <MdEdit size={buttonSize}/>
+                                <span>Edit</span>
+                            </div> : null }
+
+                            <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize}/>
+
                         </div>
                     </div>
                 </div>

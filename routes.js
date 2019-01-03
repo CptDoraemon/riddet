@@ -202,7 +202,16 @@ module.exports = function (app, db) {
                         dataExcludesHiddenPosts = [...data]
                     }
 
-                    //
+                    // add isEditable if post author is this user
+                    dataExcludesHiddenPosts.map((i) => i.isEditable = false);
+                    if (userId !== null) {
+                        const author = req.user.username;
+                        dataExcludesHiddenPosts.map((i) => {
+                            if (i.username === author) i.isEditable = true
+                        });
+                    }
+
+
                     dataExcludesHiddenPosts.length === 0 ?
                         res.json('140') :
                         res.json(dataExcludesHiddenPosts);

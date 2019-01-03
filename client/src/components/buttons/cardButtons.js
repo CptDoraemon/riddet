@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag } from "react-icons/md";
+import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage } from "react-icons/md";
+import '../header.css'
 
 class Vote extends React.Component {
     // it receives props type = 'up' || 'down'
@@ -166,6 +167,39 @@ class Save extends React.Component {
     }
 }
 
+class HideAndReport extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isDropDown: false
+        };
+        this.toggleDropDown = this.toggleDropDown.bind(this);
+    }
+    toggleDropDown() {
+        this.setState({isDropDown: !this.state.isDropDown})
+    }
+    render() {
+        const itemWrapper = this.state.isDropDown ? null : { display: 'none' };
+
+        return (
+            <React.Fragment>
+                <div className={this.props.className} onClick={this.toggleDropDown}>
+                    { this.state.isDropDown ? <MdFirstPage size={this.props.size}/> : <MdMoreHoriz size={this.props.size}/> }
+                </div>
+
+                <div className={this.props.className} onClick={this.props.handleHide} style={{...itemWrapper}}>
+                    <MdHighlightOff size={this.props.size}/>
+                    <span>hide</span>
+                </div>
+                <div className={this.props.className} style={{...itemWrapper}}>
+                    <MdFlag size={this.props.size}/>
+                    <span>report</span>
+                </div>
+            </React.Fragment>
+        )
+    }
+}
 
 
-export { Vote, Save };
+
+export { Vote, Save, HideAndReport };
