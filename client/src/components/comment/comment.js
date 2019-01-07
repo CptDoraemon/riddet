@@ -1,8 +1,23 @@
 import React from 'react';
 import './comment.css';
 import '../card.css';
-import { Vote, CommentUnclickable } from "../buttons/cardButtons";
+import { Vote, Save, Edit, Share, CommentUnclickable, Hide, Report } from "../buttons/cardButtons";
 import { PostParser } from "../createpost/postparser";
+import { CommentTextEditor } from '../createpost/texteditor';
+
+function Login (props) {
+    return (
+        <div className='comment-login'>
+            <span>What are your thoughts? Log in or Sign up </span>
+            <a href='/login' target='iframe-s'>
+                <button className='comment-login-button'>LOG IN</button>
+            </a>
+            <a href='/signup' target='iframe-s'>
+                <button className='comment-signup-button'>SIGN UP</button>
+            </a>
+        </div>
+    )
+}
 
 class Post extends React.Component {
     render() {
@@ -28,12 +43,24 @@ class Post extends React.Component {
                 dateDiffMessage = dateDiff + dateDiffMessage;
             }
         }
+        //
+        const buttonSize='15px';
+        const postId = this.props.data._id;
+        const isSaved = this.props.data.isSaved;
+        const isEditable = this.props.data.isEditable;
+        const isHidden = this.props.data.isHidden;
+        const isUpVoted = this.props.data.isUpVoted;
+        const isDownVoted = this.props.data.isDownVoted;
+        const upVotes = this.props.data.upVotes ? this.props.data.upVotes.length : 0;
+        const downVotes = this.props.data.downVotes ? this.props.data.downVotes.length : 0;
+        const count = upVotes - downVotes;
+        const buttonClassName = 'comment-post-buttons-item';
 
         return (
             <div className='comment-post-wrapper'>
                 <div className='comment-post-sidebar'>
-                    <Vote className={{...voteClassName}} isUpVoted={false} isDownVoted={false}
-                          postId={this.props.postId} count={0 - 0}/>
+                    <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted}
+                          postId={this.props.postId} count={count}/>
                 </div>
                 <div className='comment-post-content'>
                     <div className='comment-post-info'>
@@ -43,9 +70,28 @@ class Post extends React.Component {
                         </p>
                     </div>
                     <div className='comment-post-title'> <h3> {this.props.data.title} </h3> </div>
-                    <div className='comment-post-post'> <PostParser post={this.props.data.post}/> </div>
+
+                    <div className='comment-post-post'>
+                        {isHidden ?
+                            <span>You hid this post</span> :
+                            <PostParser post={this.props.data.post}/>
+                        }
+
+                    </div>
+
                     <div className='comment-post-buttons'>
-                        <CommentUnclickable className='card-body-bottombar-item'/>
+                        <CommentUnclickable className={buttonClassName} size={buttonSize}/>
+
+                        <Share className={buttonClassName} size={buttonSize} link={window.location.href}/>
+
+                        <Save className={buttonClassName} isSaved={isSaved} postId={postId} size={buttonSize}/>
+
+                        { isEditable ? <Edit size={buttonSize} className={buttonClassName}  /> : null }
+
+                        <Hide className={buttonClassName} size={buttonSize} postId={postId}/>
+
+                        <Report className={buttonClassName} size={buttonSize}/>
+
                     </div>
                 </div>
             </div>
@@ -57,17 +103,7 @@ class CommentTemplate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLogin: this.props.isLogin,
-            user: this.props.user,
-            data: {
-                username: '',
-                title: '',
-                post: '',
-                isSaved: false,
-                isUpVoted: false,
-                isDownVoted: false,
-                isEditable: false
-            }
+            data: null,
         };
         this.postId = this.props.match.params.postId;
     }
@@ -94,7 +130,16 @@ class CommentTemplate extends React.Component {
         return (
             <div className='comment-template-wrapper'>
                 <div className='comment-template-content-wrapper'>
-                    <Post postId={this.postId} data={this.state.data}/>
+                    {this.state.data !== null ? <Post postId={this.postId} data={this.state.data}/> : null }
+
+                    {
+                        this.props.isLogin ?
+                        <CommentTextEditor
+                            themeColor={this.props.themeColor}
+                            isLogin={this.props.isLogin}
+                            postId={this.postId} /> :
+                        <Login/>
+                    }
 
                 </div>
             </div>

@@ -28,10 +28,13 @@ class IFrameL extends React.Component{
         });
         document.body.style.overflow = 'auto';
     }
+    preventClose(e) {
+        e.stopPropagation();
+    }
     render() {
         return(
-            <div className={this.state.isWorking ? 'iframe-l-wrapper' : 'iframe-l-wrapper-hidden'}>
-                <div className='iframe-l-bodywrapper'>
+            <div className={this.state.isWorking ? 'iframe-l-wrapper' : 'iframe-l-wrapper-hidden'} onClick={this.close}>
+                <div className='iframe-l-bodywrapper' onClick={this.preventClose}>
                     <div className='iframe-l-headbar'>
                         <div className='iframe-l-headbar-title'>
 123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123

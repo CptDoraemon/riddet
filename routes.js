@@ -153,6 +153,17 @@ module.exports = function (app, db) {
             }
         })
     });
+
+    app.post('/createcomment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        if (req.body.comment === '' || req.body.comment === 'What are your thoughts?') {
+            res.json('131');
+            return
+        }
+        const date = new Date();
+    });
+
     app.post('/getNewPost', (req, res, next) => {
         req.isAuthenticated();
         next();
@@ -335,20 +346,26 @@ module.exports = function (app, db) {
                 post.isDownVoted = false;
                 post.isSaved = false;
                 post.isEditable = false;
+                post.isHidden = false;
+                console.log(post);
 
                 if (userId !== null) {
-                    if (userId.toString() === post.username) post.isEditable = true;
+                    if (req.user.username === post.username) post.isEditable = true;
                     const user = await db.collection('users').findOne({_id: userId});
                     if (user.savedPosts) {
                         if (user.savedPosts.indexOf(postId.toString()) !== -1) post.isSaved = true;
                     }
-                    if (user.upVotes) {
-                        if (user.upVotes.indexOf(postId.toString()) !== -1) post.isUpVoted = true;
+                    if (post.upVotes) {
+                        if (post.upVotes.indexOf(userId.toString()) !== -1) post.isUpVoted = true;
                     }
-                    if (user.downVotes) {
-                        if (user.downVotes.indexOf(postId.toString()) !== -1) post.isDownVoted = true;
+                    if (post.downVotes) {
+                        if (post.downVotes.indexOf(userId.toString()) !== -1) post.isDownVoted = true;
+                    }
+                    if (user.hiddenPosts) {
+                        if (user.hiddenPosts.indexOf(postId.toString()) !== -1) post.isHidden = true;
                     }
                 }
+                console.log(post);
                 res.json(post);
             } catch (err) {
                 console.log(err);

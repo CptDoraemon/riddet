@@ -91,9 +91,6 @@ class Vote extends React.Component {
         })
     }
 
-    componentDidMount() {
-        this.setState({isVoted: this.props.isVoted})
-    }
     render() {
         const upClassName = this.state.isUpVoted ? this.props.className.up[1] : this.props.className.up[0];
         const downClassName = this.state.isDownVoted ? this.props.className.down[1] : this.props.className.down[0];
@@ -271,6 +268,62 @@ function CommentUnclickable (props) {
     )
 }
 
+class Hide extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isHiding: false
+        };
+        this.handleHide = this.handleHide.bind(this);
+    }
+    handleHide() {
+        if (this.state.isHiding) return;
+
+        fetch('/hidepost', {
+            method: 'POST',
+            body: JSON.stringify({id: this.props.postId}),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.open('/login', 'iframe-s');
+                    this.setState({isHiding: false});
+                } else if (json === '154') {
+                    // success
+                    this.setState({isHiding: false, isHidden: true});
+                    window.location.reload();
+                } else {
+                    // failed
+                    this.setState({isHiding: false});
+                }
+            })
+            .catch(err => this.setState({isHiding: false}));
+    };
+    render() {
+        return (
+            <div className={this.props.className} onClick={this.handleHide}>
+                <MdHighlightOff size={this.props.size}/>
+                <span>hide</span>
+            </div>
+        )
+    }
+}
+
+class Report extends React.Component {
+    render() {
+        return (
+            <div className={this.props.className}>
+                <MdFlag size={this.props.size}/>
+                <span>report</span>
+            </div>
+        )
+    }
+}
 
 
-export { Vote, Save, HideAndReport, Edit, Share, CommentClickable, CommentUnclickable };
+
+export { Vote, Save, HideAndReport, Edit, Share, CommentClickable, CommentUnclickable, Hide, Report };

@@ -71,7 +71,7 @@ class Index extends React.Component {
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
-                        <Route path="/comment/:postId" render={(props) => <CommentTemplate {...props} {...authenticationTools}/> } />
+                        <Route path="/comment/:postId" render={(props) => <CommentTemplate {...props} {...authenticationTools} {...themeTools}/> } />
                     </Switch>
 
                     <IFrameS />
