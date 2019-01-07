@@ -347,7 +347,6 @@ module.exports = function (app, db) {
                 post.isSaved = false;
                 post.isEditable = false;
                 post.isHidden = false;
-                console.log(post);
 
                 if (userId !== null) {
                     if (req.user.username === post.username) post.isEditable = true;
@@ -365,7 +364,6 @@ module.exports = function (app, db) {
                         if (user.hiddenPosts.indexOf(postId.toString()) !== -1) post.isHidden = true;
                     }
                 }
-                console.log(post);
                 res.json(post);
             } catch (err) {
                 console.log(err);
