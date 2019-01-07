@@ -322,6 +322,40 @@ module.exports = function (app, db) {
         })();
     });
 
+    app.post('/getComment', (req, res, next) => {
+        req.isAuthenticated();
+        next();
+    }, (req, res) => {
+        let postId = req.body.postId;
+        const userId = req.user ? req.user._id : null;
+        (async function() {
+            try {
+                const post = await db.collection('posts').findOne({_id: ObjectId(postId)});
+                post.isUpVoted = false;
+                post.isDownVoted = false;
+                post.isSaved = false;
+                post.isEditable = false;
+
+                if (userId !== null) {
+                    if (userId.toString() === post.username) post.isEditable = true;
+                    const user = await db.collection('users').findOne({_id: userId});
+                    if (user.savedPosts) {
+                        if (user.savedPosts.indexOf(postId.toString()) !== -1) post.isSaved = true;
+                    }
+                    if (user.upVotes) {
+                        if (user.upVotes.indexOf(postId.toString()) !== -1) post.isUpVoted = true;
+                    }
+                    if (user.downVotes) {
+                        if (user.downVotes.indexOf(postId.toString()) !== -1) post.isDownVoted = true;
+                    }
+                }
+                res.json(post);
+            } catch (err) {
+                console.log(err);
+            }
+        })();
+    });
+
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage } from "react-icons/md";
+import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage, MdEdit } from "react-icons/md";
 import '../header.css'
 
 class Vote extends React.Component {
@@ -200,6 +200,77 @@ class HideAndReport extends React.Component {
     }
 }
 
+function Edit (props) {
+    return (
+        <div className={props.className}>
+            <MdEdit size={props.size}/>
+            <span>Edit</span>
+        </div>
+    )
+}
+
+class Share extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            notification: false
+        };
+        this.handleClick = this.handleClick.bind(this);
+    }
+    handleClick() {
+        const el = document.createElement('textarea');
+        el.value = this.props.link;
+        el.setAttribute('readonly', '');
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        this.setState({notification: true});
+    }
+    componentDidUpdate() {
+        if (this.state.notification === true) {
+            setTimeout(() => this.setState({notification: false}), 5000)
+        }
+    }
+
+    render() {
+        return (
+            <React.Fragment>
+                <div className={this.props.className} onClick={this.handleClick}>
+                    <MdShare size={this.props.size}/>
+                    <span>share</span>
+                </div>
+                <div className={this.state.notification ? 'notification-active' : 'notification-active notification-inactive'}>
+                    <span>Link copied to clipboard!</span>
+                </div>
+            </React.Fragment>
+        )
+    }
+}
+
+function CommentClickable (props) {
+    return (
+        <a href={'/comment/' + props.postId} target='iframe-l'>
+            <div className={props.className}>
+                <MdComment size={props.size}/>
+                <span>comment</span>
+            </div>
+        </a>
+    )
+}
+
+function CommentUnclickable (props) {
+    return (
+        <div className={props.className}>
+            <MdComment size={props.size}/>
+            <span>comment</span>
+        </div>
+    )
+}
 
 
-export { Vote, Save, HideAndReport };
+
+export { Vote, Save, HideAndReport, Edit, Share, CommentClickable, CommentUnclickable };

@@ -2,8 +2,7 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 import './card.css';
-import { Vote, Save, HideAndReport } from './buttons/cardButtons';
-import { MdComment, MdShare, MdEdit } from "react-icons/md";
+import { Vote, Save, HideAndReport, Edit, Share, CommentClickable } from './buttons/cardButtons';
 import { PostParser } from "./createpost/postparser";
 
 
@@ -155,22 +154,14 @@ class Card extends React.Component {
                                 onClick={this.unfold.bind(this)}> {this.state.contentIsMaxHeight && !this.state.unfold ? '... click to unfold ...' : null} </span>
                         </div>
                         <div className='card-body-bottombar'>
-                            <div className='card-body-bottombar-item'>
-                                <MdComment size={buttonSize}/>
-                                <span>comments</span>
-                            </div>
-                            <div className='card-body-bottombar-item'>
-                                <MdShare size={buttonSize}/>
-                                <span>share</span>
-                            </div>
+
+                            <CommentClickable postId={postId} className='card-body-bottombar-item'/>
+
+                            <Share className='card-body-bottombar-item' size={buttonSize} link={window.location.href + 'comment/' + postId}/>
 
                             <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId} size={buttonSize}/>
 
-                            { isEditable ?
-                            <div className='card-body-bottombar-item'>
-                                <MdEdit size={buttonSize}/>
-                                <span>Edit</span>
-                            </div> : null }
+                            { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' /> : null }
 
                             <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize}/>
 

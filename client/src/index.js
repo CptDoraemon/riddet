@@ -7,51 +7,16 @@ import './index.css';
 
 import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import ScrollToTop from './components/scrolltotop';
-import { IoIosBonfire, IoIosClose } from "react-icons/io";
+import { IoIosBonfire } from "react-icons/io";
 
 import { Frontpage } from './components/frontpage';
 import { Login } from './components/forms/login';
 import { Signup } from './components/forms/signup';
 import { Createpost } from './components/createpost/createpost';
+import { CommentTemplate } from "./components/comment/comment";
+import { IFrameS } from "./components/iframes/iframe-s";
+import { IFrameL } from "./components/iframes/iframe-l";
 
-class IFrameS extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            isWorking: false
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.close = this.close.bind(this);
-    }
-    handleChange() {
-        const url = document.getElementById("iframe-s").contentWindow.location.href;
-        console.log(url);
-        if (url.slice(url.length - 5, url.length) === 'close') {
-            window.location.reload();
-        } else if (url === 'about:blank') {
-
-        } else {
-            this.setState({isWorking: true});
-            document.body.style.overflow = 'hidden';
-        }
-    }
-    close() {
-        this.setState({
-            isWorking: false
-        });
-        document.body.style.overflow = 'auto';
-    }
-    render() {
-        return(
-            <div className={this.state.isWorking ? 'iframe-wrapper' : 'iframe-wrapper-hidden'}>
-                <div className='iframe-close-icon pointer' onClick={this.close}>
-                    <IoIosClose size='50px'/>
-                </div>
-                <iframe title='iframe-s' id='iframe-s' name='iframe-s' onLoad={this.handleChange}> </iframe>
-            </div>
-        )
-    }
-}
 
 class Index extends React.Component {
     constructor(props) {
@@ -106,9 +71,11 @@ class Index extends React.Component {
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
+                        <Route path="/comment/:postId" render={(props) => <CommentTemplate {...props} {...authenticationTools}/> } />
                     </Switch>
 
                     <IFrameS />
+                    <IFrameL />
                 </ScrollToTop>
             </Router>
         )
