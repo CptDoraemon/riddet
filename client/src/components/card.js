@@ -132,7 +132,7 @@ class Card extends React.Component {
                     <div className='card-sidebar'>
 
                         <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted}
-                              postId={postId} count={upVotes - downVotes}/>
+                              postId={postId} count={upVotes - downVotes} size='25px'/>
 
                     </div>
                     <div className='card-body'>
@@ -157,11 +157,11 @@ class Card extends React.Component {
 
                             <CommentClickable postId={postId} className='card-body-bottombar-item'/>
 
-                            <Share className='card-body-bottombar-item' size={buttonSize} link={window.location.href + 'comment/' + postId}/>
+                            <Share className='card-body-bottombar-item' size={buttonSize} link={window.location.href + 'comment/' + postId} icon={true}/>
 
-                            <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId} size={buttonSize}/>
+                            <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId} size={buttonSize} icon={true}/>
 
-                            { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' /> : null }
+                            { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' icon={true}/> : null }
 
                             <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize}/>
 

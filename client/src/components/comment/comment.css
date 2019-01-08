@@ -1,7 +1,7 @@
 .comment-template-wrapper {
     background-color: rgb(219, 224, 229);
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     min-width: 100px;
     display: flex;
     flex-direction: column;
@@ -42,10 +42,11 @@
     width: 100%;
     font-size: 12px;
     color: grey;
+    margin-bottom: 5px;
 }
 .comment-post-title {
     width: 100%;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 .comment-post-post {
     width: 100%;
@@ -118,4 +119,12 @@
     cursor: pointer;
     font-weight: bold;
     font-size: 12px;
+}
+
+.replya-texteditor-active {
+    width: 100%;
+}
+
+.replya-texteditor-inactive {
+    display: none;
 }

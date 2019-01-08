@@ -1,7 +1,6 @@
 .text-editor-wrapper {
     width: 100%;
     background-color: white;
-    min-height: 1000px;
     padding: 10px 0;
 }
 .text-editor-title {

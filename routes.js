@@ -18,7 +18,7 @@ module.exports = function (app, db) {
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed
     // 120 logout success
-    // 130 create post success, 131 post invalid
+    // 130 create post/reply success, 131 post/reply invalid, 133 reply/post failed
     // 140 no more new posts
     // 150 vote success, 151 vote failed, 152 save success, 153 save failed, 154 hide success, 155 hide failed
     app.post('/signup/first', (req, res) => {
@@ -154,7 +154,7 @@ module.exports = function (app, db) {
         })
     });
 
-    app.post('/createcomment', (req, res, next) => {
+    app.post('/replytopost', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         if (req.body.comment === '' || req.body.comment === 'What are your thoughts?') {
@@ -162,6 +162,24 @@ module.exports = function (app, db) {
             return
         }
         const date = new Date();
+        (async function() {
+            try {
+                const reply = await db.collection('replies').insertOne({
+                    username: req.user.username,
+                    comment: req.body.comment,
+                    parentPost: req.body.parentPostId,
+                    date: date,
+                });
+                await  db.collection('posts').updateOne(
+                    { _id: ObjectId(req.body.parentPostId) },
+                    { $push: {comments: reply.insertedId.toString()}}
+                    );
+                res.json('130');
+            } catch(err) {
+                console.log(err);
+                res.json('106');
+            }
+        })();
     });
 
     app.post('/getNewPost', (req, res, next) => {

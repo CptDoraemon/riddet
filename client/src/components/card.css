@@ -25,7 +25,7 @@
 .card-sidebar-voteup {
     color: grey;
     cursor: pointer;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 .card-sidebar-voteup:hover {
     color: rgb(255, 47, 25);
@@ -33,7 +33,7 @@
 .card-sidebar-voteup-voted {
     color: rgb(255, 47, 25);
     cursor: pointer;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 .card-sidebar-votedown {
     color: grey;

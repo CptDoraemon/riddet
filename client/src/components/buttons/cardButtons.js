@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
-import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage, MdEdit } from "react-icons/md";
-import '../header.css'
+import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage, MdEdit, MdReply } from "react-icons/md";
+import '../header.css';
 
 class Vote extends React.Component {
     // it receives props type = 'up' || 'down'
@@ -98,13 +98,18 @@ class Vote extends React.Component {
         return (
             <React.Fragment>
                 <div className={upClassName} onClick={this.handleUpVote}>
-                        <GoArrowUp size='25px'/>
+                        <GoArrowUp size={this.props.size}/>
                 </div>
-                <div className={countClassName}>
-                    { this.props.count + this.state.countOffset}
-                </div>
+
+                { /* omit count prop for a compact vote */ }
+                { this.props.count !== null ?
+                    <div className={countClassName}>
+                        { this.props.count + this.state.countOffset}
+                    </div> : null
+                }
+
                 <div className={downClassName} onClick={this.handleDownVote}>
-                    <GoArrowDown size='25px'/>
+                    <GoArrowDown size={this.props.size}/>
                 </div>
             </React.Fragment>
         )
@@ -155,9 +160,10 @@ class Save extends React.Component {
             .catch(err => failedAction());
     }
     render() {
+        const icon = this.state.isSaved ? <MdBookmark size='20px'/> : <MdBookmarkBorder size='20px'/>;
         return (
             <div className={this.props.className} onClick={this.handleClick}>
-                { this.state.isSaved ? <MdBookmark size='20px'/> : <MdBookmarkBorder size='20px'/> }
+                { this.props.icon ? icon : null }
                 { this.state.isSaved ? <span>saved</span> : <span>save</span> }
             </div>
         )
@@ -200,7 +206,7 @@ class HideAndReport extends React.Component {
 function Edit (props) {
     return (
         <div className={props.className}>
-            <MdEdit size={props.size}/>
+            { props.icon ? <MdEdit size={props.size}/> : null }
             <span>Edit</span>
         </div>
     )
@@ -237,7 +243,7 @@ class Share extends React.Component {
         return (
             <React.Fragment>
                 <div className={this.props.className} onClick={this.handleClick}>
-                    <MdShare size={this.props.size}/>
+                    { this.props.icon ? <MdShare size={this.props.size}/> : null }
                     <span>share</span>
                 </div>
                 <div className={this.state.notification ? 'notification-active' : 'notification-active notification-inactive'}>
@@ -266,6 +272,15 @@ function CommentUnclickable (props) {
             <span>comment</span>
         </div>
     )
+}
+
+function Reply(props){
+        return (
+            <div className={props.className} onClick={props.handleClick}>
+                <MdReply size={props.size}/>
+                <span>reply</span>
+            </div>
+        )
 }
 
 class Hide extends React.Component {
@@ -306,7 +321,7 @@ class Hide extends React.Component {
     render() {
         return (
             <div className={this.props.className} onClick={this.handleHide}>
-                <MdHighlightOff size={this.props.size}/>
+                { this.props.icon ? <MdHighlightOff size={this.props.size}/> : null }
                 <span>hide</span>
             </div>
         )
@@ -317,7 +332,7 @@ class Report extends React.Component {
     render() {
         return (
             <div className={this.props.className}>
-                <MdFlag size={this.props.size}/>
+                { this.props.icon ? <MdFlag size={this.props.size}/> : null }
                 <span>report</span>
             </div>
         )
@@ -326,4 +341,4 @@ class Report extends React.Component {
 
 
 
-export { Vote, Save, HideAndReport, Edit, Share, CommentClickable, CommentUnclickable, Hide, Report };
+export { Vote, Save, HideAndReport, Edit, Share, CommentClickable, CommentUnclickable, Reply, Hide, Report };

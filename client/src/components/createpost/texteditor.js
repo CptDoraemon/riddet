@@ -79,7 +79,7 @@ function postSubmitHandler (e) {
                 this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
             });
 }
-const commentSubmitHandler = (e) => {
+function commentSubmitHandler (e) {
     e.preventDefault();
     if (!this.props.isLogin) {
         window.open('/login', 'iframe-s');
@@ -87,11 +87,10 @@ const commentSubmitHandler = (e) => {
     }
     const data = {
         parentPostId: this.props.postId,
-        parentCommentId: this.props.commentId,
         comment: this.state.tePost
     };
     this.setState({isSubmitting: true});
-    fetch('/createcomment', {
+    fetch('/replytopost', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
@@ -117,12 +116,16 @@ const commentSubmitHandler = (e) => {
 };
 
 const PostTextEditor = textEditorHOC(postSubmitHandler);
-const CommentTextEditor = textEditorHOC(commentSubmitHandler, false, true, 'What are your thoughts?');
+const CommentTextEditor = textEditorHOC(commentSubmitHandler, false, true, 'What are your thoughts?', false, true);
+const ReplyTextEditor = textEditorHOC(commentSubmitHandler, false, true, 'What are your thoughts?', true, false);
+
 
 function textEditorHOC (submitHandler,
                         requireTitle = true,
                         shorterTextarea = false,
-                        textareaDefault = 'Text (optional)') {
+                        textareaDefault = 'Text (optional)',
+                        reply = false,
+                        comment = false) {
     return class extends React.Component {
         constructor(props) {
             super(props);
@@ -402,7 +405,9 @@ function textEditorHOC (submitHandler,
                         {/* POST END*/}
 
                         <div className={buttonClassName}>
-                            <button style={{backgroundColor: this.props.themeColor[0]}} type='submit' disabled={!isValid}>Post</button>
+                            <button style={{backgroundColor: this.props.themeColor[0]}} type='submit' disabled={!isValid}>
+                                { comment ? 'comment' : reply ? 'reply' : 'post' }
+                            </button>
                         </div>
                         <p className='text-editor-response'>{ this.state.response }</p>
                     </form>
@@ -426,4 +431,4 @@ function getActualHeight(el) {
     return height;
 }
 
-export { PostTextEditor, CommentTextEditor };
+export { PostTextEditor, CommentTextEditor, ReplyTextEditor };
