@@ -107,6 +107,14 @@
     transition: width 0.5s, opacity 0.2s;
     border-radius: 0 0 0 5px;
 }
+.shorter {
+    /* COMMENT TEXT EDITOR */
+    min-height: 100px !important;
+}
+.shorter textarea{
+    /* COMMENT TEXT EDITOR */
+    min-height: 100px !important;
+}
 .text-editor-preview {
     background-color: rgb(250, 250, 250);
     border-radius: 0 0 5px 0;

@@ -132,9 +132,14 @@ class CommentTemplate extends React.Component {
                 <div className='comment-template-content-wrapper'>
                     {this.state.data !== null ? <Post postId={this.postId} data={this.state.data}/> : null }
 
-
-                    <Login/>
-
+                    {
+                        this.props.isLogin ?
+                        <CommentTextEditor
+                            themeColor={this.props.themeColor}
+                            isLogin={this.props.isLogin}
+                            postId={this.postId} /> :
+                        <Login/>
+                    }
 
                 </div>
             </div>
