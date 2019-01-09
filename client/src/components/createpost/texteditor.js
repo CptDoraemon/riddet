@@ -115,17 +115,16 @@ function commentSubmitHandler (e) {
         });
 };
 
-const PostTextEditor = textEditorHOC(postSubmitHandler);
-const CommentTextEditor = textEditorHOC(commentSubmitHandler, false, true, 'What are your thoughts?', false, true);
-const ReplyTextEditor = textEditorHOC(commentSubmitHandler, false, true, 'What are your thoughts?', true, false);
+const PostTextEditor = textEditorHOC(postSubmitHandler, 'post');
+const CommentTextEditor = textEditorHOC(commentSubmitHandler, 'comment', false, true, 'What are your thoughts?');
+const ReplyTextEditor = textEditorHOC(commentSubmitHandler, 'reply', false, true, 'What are your thoughts?');
 
 
 function textEditorHOC (submitHandler,
+                        button,
                         requireTitle = true,
                         shorterTextarea = false,
-                        textareaDefault = 'Text (optional)',
-                        reply = false,
-                        comment = false) {
+                        textareaDefault = 'Text (optional)',) {
     return class extends React.Component {
         constructor(props) {
             super(props);
@@ -406,7 +405,7 @@ function textEditorHOC (submitHandler,
 
                         <div className={buttonClassName}>
                             <button style={{backgroundColor: this.props.themeColor[0]}} type='submit' disabled={!isValid}>
-                                { comment ? 'comment' : reply ? 'reply' : 'post' }
+                                { button }
                             </button>
                         </div>
                         <p className='text-editor-response'>{ this.state.response }</p>

@@ -5,6 +5,11 @@ import { Vote, Save, Edit, Share, CommentUnclickable, Hide, Report, Reply } from
 import { PostParser } from "../createpost/postparser";
 import {CommentTextEditor, ReplyTextEditor} from '../createpost/texteditor';
 
+const nestedArrayTools = require('../tools/nestedArrayTools');
+const searchByFlattenIndex = nestedArrayTools.searchByFlattenIndex;
+const replaceByFlattenIndex = nestedArrayTools.replaceByFlattenIndex;
+const flattenArray = nestedArrayTools.flattenArray;
+
 function Login (props) {
     return (
         <div className='comment-login'>
@@ -29,6 +34,10 @@ function PostHOC (reply = false) {
             this.toggleReplyTextEditor = this.toggleReplyTextEditor.bind(this);
         }
         toggleReplyTextEditor() {
+            if (!this.props.isLogin) {
+                window.open('/login', 'iframe-s');
+                return
+            }
             this.setState({replyTextEditor: !this.state.replyTextEditor});
         }
         render() {
@@ -67,6 +76,8 @@ function PostHOC (reply = false) {
             const count = upVotes - downVotes;
             const buttonClassName = 'comment-post-buttons-item';
 
+            const postOrData = reply ? this.props.data.comment : this.props.data.post;
+
             return (
                 <div className='comment-post-wrapper'>
                     {/* Vote SideBar, omit count prop for a compact vote */}
@@ -103,7 +114,7 @@ function PostHOC (reply = false) {
                         <div className={reply ? 'comment-post-reply' : 'comment-post-post'} >
                             {isHidden ?
                                 <span>You hid this post</span> :
-                                <PostParser post={this.props.data.post}/>
+                                <PostParser post={postOrData}/>
                             }
                         </div>
 
@@ -127,7 +138,7 @@ function PostHOC (reply = false) {
 
                         { /* TextEditor for reply */ }
                         { reply ?
-                        <div className={this.state.replyTextEditor ? 'replya-texteditor-active' : 'replya-texteditor-inactive'}>
+                        <div className={this.state.replyTextEditor ? 'reply-texteditor-active' : 'reply-texteditor-inactive'}>
                             <ReplyTextEditor themeColor={this.props.themeColor} isLogin={this.props.isLogin} postId={this.props.postId}/>
                         </div> : null }
                     </div>
@@ -140,18 +151,93 @@ function PostHOC (reply = false) {
 const Post = PostHOC();
 const ReplyPost = PostHOC(true);
 
+function ReplyPosts(props) {
+
+    function renderPost(array) {
+        let posts = array.map((i) => i instanceof Array ?
+            renderPost(i) :
+            i instanceof Object ?
+            <ReplyPost key={i._id} data={i} themeColor={props.themeColor} isLogin={props.isLogin} postId={props.postId}/> :
+            null);
+        return posts;
+    }
+
+
+    return renderPost(props.data);
+}
+
+
 class CommentTemplate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: null,
+            postData: null,
+            commentArray: null,
+            noMoreComment: false,
         };
         this.postId = this.props.match.params.postId;
+        this.isLoadingComment = false;
+        this.commentArrayFlatten= null;
+        this.noMoreComment= false;
+        this.lastCommentOrder = -1;
+        this.loadHowManyComments = 10;
+        this.bottomRef = React.createRef();
+        this.loadMoreComments = this.loadMoreComments.bind(this);
+        this.scrolled = this.scrolled.bind(this);
+    }
+    scrolled() {
+        const scrolledBottom = window.scrollY + window.innerHeight;
+        const height = this.bottomRef.current.offsetTop;
+        if (scrolledBottom >= height && !this.isLoadingComment) {
+            this.loadMoreComments()
+        }
+    }
+    loadMoreComments(commentArray = this.state.commentArray.slice()) {
+        if (this.noMoreComment || this.isLoadingComment) return;
+        this.isLoadingComment = true;
+
+        console.log(commentArray);
+        console.log(commentArray);
+        const start = this.lastCommentOrder + 1;
+        const end = start + this.loadHowManyComments;
+        const commentRequesting = this.commentArrayFlatten.slice(start, end);
+
+        console.log(commentRequesting);
+        fetch('/getComment', {
+            method: 'POST',
+            body: JSON.stringify({commentRequesting: commentRequesting}),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                // upon success, replace the id in commentArray with comment object, update this.lastCommentOrder
+                const commentRequested = json.slice();
+                console.log(commentRequested);
+                let start = this.lastCommentOrder + 1;
+                commentRequested.map((i) => {
+                    commentArray = replaceByFlattenIndex(commentArray, start, i);
+                    start++
+                });
+                if (end >= this.commentArrayFlatten.length) {
+                    this.noMoreComment = true;
+                }
+                this.lastCommentOrder += this.loadHowManyComments;
+                this.isLoadingComment = false;
+
+                this.setState({commentArray: commentArray});
+            })
+            .catch((err) => {
+                console.log(err);
+            })
     }
     componentDidMount() {
         this.props.verifyAuthentication();
+        window.addEventListener('scroll', this.scrolled);
 
-        fetch('/getComment', {
+        fetch('/getCommentMainPost', {
             method: 'POST',
             body: JSON.stringify({postId: this.postId}),
             headers:{
@@ -161,19 +247,34 @@ class CommentTemplate extends React.Component {
         })
             .then(res => res.json())
             .then(json => {
-                this.setState({data: json})
+                let flatten;
+                if (json.comments) {
+                    flatten= flattenArray(json.comments);
+                }
+                this.commentArrayFlatten = flatten;
+                // If this post has no comments, set this.noMoreComment
+                if (!json.comments) {
+                    this.noMoreComment = true;
+                }
+                this.setState({postData: json, commentArray: json.comments});
+                // load comment
+                this.loadMoreComments(json.comments);
             })
             .catch((err) => {
                 console.log(err);
-            })
+            });
+
+    }
+    componentWillUnmount() {
+        window.addEventListener('scroll', this.scrolled);
     }
     render() {
         return (
             <div className='comment-template-wrapper'>
                 <div className='comment-template-content-wrapper'>
 
-                    { this.state.data !== null ?
-                        <Post postId={this.postId} data={this.state.data}/> : null }
+                    { this.state.postData !== null ?
+                        <Post postId={this.postId} data={this.state.postData}/> : null }
 
                     {
                         this.props.isLogin ?
@@ -184,18 +285,15 @@ class CommentTemplate extends React.Component {
                         <Login/>
                     }
 
-                    { this.state.data !== null ?
-                        <ReplyPost postId={this.postId} data={this.state.data} themeColor={this.props.themeColor}/> : null }
-
-                    { this.state.data !== null ?
-                        <ReplyPost postId={this.postId} data={this.state.data} themeColor={this.props.themeColor}
-                                   /> : null }
-
-                    { this.state.data !== null ?
-                        <ReplyPost postId={this.postId} data={this.state.data} themeColor={this.props.themeColor}
-                                   /> : null }
+                    {
+                        this.state.commentArray === null || !this.state.commentArray ?
+                        <div className='comment-no-comment'>Be the first one to comment!</div> :
+                        <ReplyPosts data={this.state.commentArray} isLogin={this.props.isLogin} themeColor={this.props.themeColor} postId={this.props.postId}/>
+                    }
 
 
+
+                    <div ref={this.bottomRef} />
 
                 </div>
             </div>

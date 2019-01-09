@@ -11,7 +11,7 @@
 .comment-template-content-wrapper {
     background-color: white;
     width: calc(100% - 50px);
-    margin-top: 20px;
+    margin: 20px 0;
     border-radius: 5px;
 }
 .comment-post-wrapper {
@@ -121,10 +121,18 @@
     font-size: 12px;
 }
 
-.replya-texteditor-active {
+.reply-texteditor-active {
     width: 100%;
 }
 
-.replya-texteditor-inactive {
+.reply-texteditor-inactive {
     display: none;
+}
+
+.comment-no-comment {
+    width: 100%;
+    text-align: center;
+    margin: 100px 0;
+    font-weight: bold;
+    color: grey;
 }

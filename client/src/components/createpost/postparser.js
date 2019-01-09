@@ -33,6 +33,7 @@ import React from 'react';
 class PostParser extends React.Component {
     render () {
         let post = JSON.stringify(this.props.post);
+        post = !post ? '' : post;
         post = post.slice(1, post.length - 1);
         post = post.split('\\n');
         const posts = post.map((i) => <p> {i} </p>);

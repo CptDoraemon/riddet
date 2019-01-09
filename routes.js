@@ -154,7 +154,7 @@ module.exports = function (app, db) {
         })
     });
 
-    app.post('/replytopost', (req, res, next) => {
+    app.post('/replyToPost', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         if (req.body.comment === '' || req.body.comment === 'What are your thoughts?') {
@@ -164,7 +164,7 @@ module.exports = function (app, db) {
         const date = new Date();
         (async function() {
             try {
-                const reply = await db.collection('replies').insertOne({
+                const reply = await db.collection('comments').insertOne({
                     username: req.user.username,
                     comment: req.body.comment,
                     parentPost: req.body.parentPostId,
@@ -351,7 +351,8 @@ module.exports = function (app, db) {
         })();
     });
 
-    app.post('/getComment', (req, res, next) => {
+    // Load the main post only for comment page.
+    app.post('/getCommentMainPost', (req, res, next) => {
         req.isAuthenticated();
         next();
     }, (req, res) => {
@@ -365,10 +366,11 @@ module.exports = function (app, db) {
                 post.isSaved = false;
                 post.isEditable = false;
                 post.isHidden = false;
+                const user = await db.collection('users').findOne({_id: userId});
 
-                if (userId !== null) {
+
+                function appendProperties(post, postId) {
                     if (req.user.username === post.username) post.isEditable = true;
-                    const user = await db.collection('users').findOne({_id: userId});
                     if (user.savedPosts) {
                         if (user.savedPosts.indexOf(postId.toString()) !== -1) post.isSaved = true;
                     }
@@ -382,7 +384,57 @@ module.exports = function (app, db) {
                         if (user.hiddenPosts.indexOf(postId.toString()) !== -1) post.isHidden = true;
                     }
                 }
+                // IF LOG IN, ADD PROPERTIES:
+                if (userId !== null) {
+                    appendProperties(post, postId);
+                }
                 res.json(post);
+            } catch (err) {
+                console.log(err);
+            }
+        })();
+    });
+
+    // load comments only for comment page
+    app.post('/getComment', (req, res, next) => {
+        req.isAuthenticated();
+        next();
+    }, (req, res) => {
+        const userId = req.user ? req.user._id : null;
+        let commentRequesting = req.body.commentRequesting;
+        commentRequesting = commentRequesting.map((i) => ObjectId(i));
+        (async function() {
+            try {
+                let comments = await db.collection('comments').find({_id: {$in: commentRequesting}}).toArray();
+                const user = await db.collection('users').findOne({_id: userId});
+                //
+                function appendProperties(comment, commentId, userId) {
+                    if (req.user.username === comment.username) comment.isEditable = true;
+                    if (user.savedComments) {
+                        if (user.savedComments.indexOf(commentId.toString()) !== -1) comment.isSaved = true;
+                    }
+                    if (comment.upVotes) {
+                        if (comment.upVotes.indexOf(userId.toString()) !== -1) comment.isUpVoted = true;
+                    }
+                    if (comment.downVotes) {
+                        if (comment.downVotes.indexOf(userId.toString()) !== -1) comment.isDownVoted = true;
+                    }
+                    if (user.hiddenComments) {
+                        if (user.hiddenComments.indexOf(commentId.toString()) !== -1) comment.isHidden = true;
+                    }
+                }
+                comments.map((comment) => {
+                    comment.isEditable = false;
+                    comment.isSaved = false;
+                    comment.isUpVoted = false;
+                    comment.isDownVoted = false;
+                    comment.isHidden = false;
+                });
+                // IF LOG IN, ADD PROPERTIES:
+                if (userId !== null) {
+                    comments.map((comment) => appendProperties(comment, comment._id, userId))
+                }
+                res.json(comments);
             } catch (err) {
                 console.log(err);
             }
