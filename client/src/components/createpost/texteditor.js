@@ -114,10 +114,47 @@ function commentSubmitHandler (e) {
             this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
         });
 };
+function replySubmitHandler(e) {
+    e.preventDefault();
+    if (!this.props.isLogin) {
+        window.open('/login', 'iframe-s');
+        return
+    }
+    const data = {
+        parentPostId: this.props.postId,
+        parentCommentId: this.props.parentCommentId,
+        comment: this.state.tePost
+    };
+    console.log(this.props);
+    this.setState({isSubmitting: true});
+    fetch('/replyToComment', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        credentials: "same-origin"
+    })
+        .then(res => res.json())
+        .then(json => {
+            if (json === '111') {
+                window.open('/login', 'iframe-s');
+                this.setState({isSubmitting: false});
+            } else if (json === '106' || json === '131') {
+                this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+            } else if (json === '130') {
+                this.setState({response: 'Submitted!'});
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+            this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+        });
+}
 
 const PostTextEditor = textEditorHOC(postSubmitHandler, 'post');
 const CommentTextEditor = textEditorHOC(commentSubmitHandler, 'comment', false, true, 'What are your thoughts?');
-const ReplyTextEditor = textEditorHOC(commentSubmitHandler, 'reply', false, true, 'What are your thoughts?');
+const ReplyTextEditor = textEditorHOC(replySubmitHandler, 'reply', false, true, 'What are your thoughts?');
 
 
 function textEditorHOC (submitHandler,

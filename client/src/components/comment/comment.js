@@ -78,71 +78,78 @@ function PostHOC (reply = false) {
 
             const postOrData = reply ? this.props.data.comment : this.props.data.post;
 
+            const replyIndentationCSS = {
+                marginLeft: this.props.identation*50 + 'px',
+                borderLeft: '3px solid rgba(0,0,0,0.1)',
+            };
+            const replyIndentation = reply ? replyIndentationCSS : null;
+
             return (
-                <div className='comment-post-wrapper'>
-                    {/* Vote SideBar, omit count prop for a compact vote */}
-                    <div className='comment-post-sidebar'>
-                        <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted}
-                              postId={this.props.postId} count={reply ? null : count} size={reply ? '20px' : '25px'}/>
-                    </div>
-
-                    <div className='comment-post-content'>
-                        {/* info */}
-
-                        { reply ?
-                            <div className='comment-post-info'>
-                                    <span> u/{this.props.data.username}</span>
-                                    <span> &middot; </span>
-                                    <span> { count === 0 ? count + ' point' : count + ' points'}</span>
-                                    <span> &middot; </span>
-                                    <span> {dateDiffMessage}</span>
-                            </div> :
-                            <div className='comment-post-info'>
-                                <p>Posted by
-                                    <span> u/{this.props.data.username}</span>
-                                    <span> {dateDiffMessage}</span>
-                                </p>
-                            </div>
-                        }
-
-                        {/* title */}
-                        { !reply ?
-                            <div className='comment-post-title'> <h3> {this.props.data.title} </h3> </div> :
-                            null }
-
-                        {/* post */}
-                        <div className={reply ? 'comment-post-reply' : 'comment-post-post'} >
-                            {isHidden ?
-                                <span>You hid this post</span> :
-                                <PostParser post={postOrData}/>
-                            }
+                <React.Fragment>
+                    <div className='comment-post-wrapper' style={{...replyIndentation}}>
+                        {/* Vote SideBar, omit count prop for a compact vote */}
+                        <div className='comment-post-sidebar'>
+                            <Vote className={{...voteClassName}} isUpVoted={isUpVoted} isDownVoted={isDownVoted}
+                                  postId={this.props.postId} count={reply ? null : count} size={reply ? '20px' : '25px'}/>
                         </div>
 
-                        <div className='comment-post-buttons'>
+                        <div className='comment-post-content'>
+                            {/* info */}
+
                             { reply ?
-                                <Reply className={buttonClassName} size={buttonSize} handleClick={this.toggleReplyTextEditor}/> :
-                                <CommentUnclickable className={buttonClassName} size={buttonSize} />
+                                <div className='comment-post-info'>
+                                        <span> u/{this.props.data.username}</span>
+                                        <span> &middot; </span>
+                                        <span> { count === 0 ? count + ' point' : count + ' points'}</span>
+                                        <span> &middot; </span>
+                                        <span> {dateDiffMessage}</span>
+                                </div> :
+                                <div className='comment-post-info'>
+                                    <p>Posted by
+                                        <span> u/{this.props.data.username}</span>
+                                        <span> {dateDiffMessage}</span>
+                                    </p>
+                                </div>
                             }
 
-                            <Share className={buttonClassName} size={buttonSize} link={window.location.href} icon={!reply}/>
+                            {/* title */}
+                            { !reply ?
+                                <div className='comment-post-title'> <h3> {this.props.data.title} </h3> </div> :
+                                null }
 
-                            <Save className={buttonClassName} isSaved={isSaved} postId={postId} size={buttonSize} icon={!reply}/>
+                            {/* post */}
+                            <div className={reply ? 'comment-post-reply' : 'comment-post-post'} >
+                                {isHidden ?
+                                    <span>You hid this post</span> :
+                                    <PostParser post={postOrData}/>
+                                }
+                            </div>
 
-                            { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={!reply} /> : null }
+                            <div className='comment-post-buttons'>
+                                { reply ?
+                                    <Reply className={buttonClassName} size={buttonSize} handleClick={this.toggleReplyTextEditor}/> :
+                                    <CommentUnclickable className={buttonClassName} size={buttonSize} />
+                                }
 
-                            <Hide className={buttonClassName} size={buttonSize} postId={postId} icon={!reply}/>
+                                <Share className={buttonClassName} size={buttonSize} link={window.location.href} icon={!reply}/>
 
-                            <Report className={buttonClassName} size={buttonSize} icon={!reply}/>
+                                <Save className={buttonClassName} isSaved={isSaved} postId={postId} size={buttonSize} icon={!reply}/>
 
+                                { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={!reply} /> : null }
+
+                                <Hide className={buttonClassName} size={buttonSize} postId={postId} icon={!reply}/>
+
+                                <Report className={buttonClassName} size={buttonSize} icon={!reply}/>
+
+                            </div>
                         </div>
-
-                        { /* TextEditor for reply */ }
-                        { reply ?
-                        <div className={this.state.replyTextEditor ? 'reply-texteditor-active' : 'reply-texteditor-inactive'}>
-                            <ReplyTextEditor themeColor={this.props.themeColor} isLogin={this.props.isLogin} postId={this.props.postId}/>
-                        </div> : null }
                     </div>
-                </div>
+                    { /* TextEditor for reply */ }
+                    { reply ?
+                        <div className={this.state.replyTextEditor ? 'reply-texteditor-active' : 'reply-texteditor-inactive'}>
+                            <ReplyTextEditor themeColor={this.props.themeColor} isLogin={this.props.isLogin} postId={this.props.postId} parentCommentId={this.props.data._id}/>
+                        </div> : null }
+                </React.Fragment>
             )
         }
     }
@@ -153,17 +160,34 @@ const ReplyPost = PostHOC(true);
 
 function ReplyPosts(props) {
 
+    let renderArray = [];
+    console.log(props.data);
+    let indentation = -1;
+
     function renderPost(array) {
-        let posts = array.map((i) => i instanceof Array ?
-            renderPost(i) :
-            i instanceof Object ?
-            <ReplyPost key={i._id} data={i} themeColor={props.themeColor} isLogin={props.isLogin} postId={props.postId}/> :
-            null);
-        return posts;
+        indentation++;
+        for (let i=0; i<array.length; i++) {
+            if (array[i] instanceof Object) {
+                // array item could be id (typeof string), unloaded yet.
+                if (array[i] instanceof Array) {
+                    renderPost(array[i]);
+                } else {
+                    if (indentation > 0 && i === 0) {
+                        // data is comment object
+                        renderArray.push(<ReplyPost key={array[i]._id} data={array[i]} themeColor={props.themeColor} isLogin={props.isLogin} postId={props.postId} identation={indentation - 1}/>);
+                    } else {
+                        renderArray.push(<ReplyPost key={array[i]._id} data={array[i]} themeColor={props.themeColor} isLogin={props.isLogin} postId={props.postId} identation={indentation}/>);
+                    }
+                }
+            }
+        }
+        indentation--;
     }
 
+    renderPost(props.data);
+    const render = renderArray.map((j) => j);
+    return render;
 
-    return renderPost(props.data);
 }
 
 
@@ -196,13 +220,10 @@ class CommentTemplate extends React.Component {
         if (this.noMoreComment || this.isLoadingComment) return;
         this.isLoadingComment = true;
 
-        console.log(commentArray);
-        console.log(commentArray);
         const start = this.lastCommentOrder + 1;
         const end = start + this.loadHowManyComments;
         const commentRequesting = this.commentArrayFlatten.slice(start, end);
 
-        console.log(commentRequesting);
         fetch('/getComment', {
             method: 'POST',
             body: JSON.stringify({commentRequesting: commentRequesting}),
@@ -215,12 +236,12 @@ class CommentTemplate extends React.Component {
             .then(json => {
                 // upon success, replace the id in commentArray with comment object, update this.lastCommentOrder
                 const commentRequested = json.slice();
-                console.log(commentRequested);
                 let start = this.lastCommentOrder + 1;
-                commentRequested.map((i) => {
-                    commentArray = replaceByFlattenIndex(commentArray, start, i);
-                    start++
-                });
+                for (let i=0; i<commentRequested.length; i++) {
+                    commentArray = replaceByFlattenIndex(commentArray, start, commentRequested[i]);
+                    start++;
+                }
+
                 if (end >= this.commentArrayFlatten.length) {
                     this.noMoreComment = true;
                 }
@@ -274,7 +295,7 @@ class CommentTemplate extends React.Component {
                 <div className='comment-template-content-wrapper'>
 
                     { this.state.postData !== null ?
-                        <Post postId={this.postId} data={this.state.postData}/> : null }
+                        <Post postId={this.postId} data={this.state.postData} isLogin={this.props.isLogin} themeColor={this.props.themeColor}/> : null }
 
                     {
                         this.props.isLogin ?
@@ -288,7 +309,7 @@ class CommentTemplate extends React.Component {
                     {
                         this.state.commentArray === null || !this.state.commentArray ?
                         <div className='comment-no-comment'>Be the first one to comment!</div> :
-                        <ReplyPosts data={this.state.commentArray} isLogin={this.props.isLogin} themeColor={this.props.themeColor} postId={this.props.postId}/>
+                        <ReplyPosts data={this.state.commentArray} isLogin={this.props.isLogin} themeColor={this.props.themeColor} postId={this.postId}/>
                     }
 
 

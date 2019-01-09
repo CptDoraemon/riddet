@@ -182,6 +182,62 @@ module.exports = function (app, db) {
         })();
     });
 
+    app.post('/replyToComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        if (req.body.comment === '' || req.body.comment === 'What are your thoughts?') {
+            res.json('131');
+            return
+        }
+        // RECEIVED:
+        // const data = {
+        //     parentPostId: this.props.postId,
+        //     parentCommentId: this.props.parentCommentId,
+        //     comment: this.state.tePost
+        // };
+        const date = new Date();
+        (async function() {
+            try {
+                const reply = await db.collection('comments').insertOne({
+                    username: req.user.username,
+                    comment: req.body.comment,
+                    parentPost: req.body.parentPostId.toString(),
+                    parentCommentId: req.body.parentCommentId.toString(),
+                    date: date,
+                });
+                let post = await db.collection('posts').findOne({  _id: ObjectId(req.body.parentPostId) });
+                let comments = post.comments;
+                const parentCommentId = req.body.parentCommentId.toString();
+                const commentId = reply.insertedId.toString();
+
+                function loop(array) {
+                    for (let i=0; i< array.length; i++) {
+                        if(array[i] instanceof Array) {
+                            if(array[i][0] === parentCommentId){
+                                array[i].push(commentId);
+                            } else {
+                                loop(array[i])
+                            }
+                        } else {
+                            if (array[i] ===  parentCommentId) {
+                                let newArray = [];
+                                newArray.push(array[i]);
+                                newArray.push(commentId);
+                                array[i] = newArray;
+                            }
+                        }
+                    }
+                }
+                loop(comments);
+                await db.collection('posts').updateOne({_id: post._id}, {$set: {comments: comments}});
+                res.json('130');
+            } catch(err) {
+                console.log(err);
+                res.json('106');
+            }
+        })();
+    });
+
     app.post('/getNewPost', (req, res, next) => {
         req.isAuthenticated();
         next();
@@ -405,7 +461,13 @@ module.exports = function (app, db) {
         commentRequesting = commentRequesting.map((i) => ObjectId(i));
         (async function() {
             try {
-                let comments = await db.collection('comments').find({_id: {$in: commentRequesting}}).toArray();
+                let comments = [];
+                // CHANGE THIS LOOP LATER!! USE ONE QUERY
+                for (let i=0; i<commentRequesting.length; i++) {
+                    let comment = await db.collection('comments').findOne({_id: commentRequesting[i]});
+                    comments.push(comment);
+                }
+                //let comments = await db.collection('comments').find({_id: {$in: commentRequesting}}).toArray();
                 const user = await db.collection('users').findOne({_id: userId});
                 //
                 function appendProperties(comment, commentId, userId) {
