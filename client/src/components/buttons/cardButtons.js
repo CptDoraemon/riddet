@@ -11,16 +11,16 @@ class Vote extends React.Component {
         this.state = {
             isUpVoted: this.props.isUpVoted,
             isDownVoted: this.props.isDownVoted,
-            isVoting: false,
             countOffset: 0,
         };
+        this.isVoting = false;
         this.handleUpVote = this.handleUpVote.bind(this);
         this.handleDownVote = this.handleDownVote.bind(this);
     }
     handleUpVote(e) {
         e.preventDefault();
-        if (this.state.isVoting) return;
-        this.setState({isVoting: true});
+        if (this.isVoting) return;
+        this.isVoting = true;
 
         if (this.state.isUpVoted && !this.state.isDownVoted) {
             // cancel up
@@ -38,7 +38,8 @@ class Vote extends React.Component {
     }
     handleDownVote(e) {
         e.preventDefault();
-        if (this.state.isVoting) return;
+        if (this.isVoting) return;
+        this.isVoting = true;
 
         if (this.state.isUpVoted && !this.state.isDownVoted) {
             // cancel up, vote down
@@ -55,18 +56,33 @@ class Vote extends React.Component {
         }
     }
     vote(isUpVote, isCancel, offset) {
-        this.setState({isVoting: true});
-        const link = isUpVote ? '/upvote' : '/downvote';
+        let link;
+        if (this.props.type === 'post') {
+            if (isUpVote) {
+                link = '/upVote'
+            } else if (!isUpVote) {
+                link = '/downVote'
+            }
+        } else if (this.props.type === 'comment') {
+            if (isUpVote) {
+                link = '/upVoteComment'
+            } else if (!isUpVote){
+                link = '/downVoteComment'
+            }
+        }
         const state = isUpVote ? 'isUpVoted' : 'isDownVoted';
         const failedAction = () => {
-            this.setState({isVoting: false});
+            this.isVoting = false;
         };
         const successAction = () => {
-            this.setState({isVoting: false, [state]: !isCancel, countOffset: this.state.countOffset + offset});
+            this.isVoting = false;
+            this.setState({[state]: !isCancel, countOffset: this.state.countOffset + offset});
         };
+
+        const id = this.props.type === 'post' ? this.props.postId : this.props.commentId;
         fetch(link, {
             method: 'POST',
-            body: JSON.stringify({id: this.props.postId, isCancel: isCancel}),
+            body: JSON.stringify({id: id, isCancel: isCancel}),
             headers:{
                 'Content-Type': 'application/json; charset=utf-8',
             },
@@ -117,26 +133,30 @@ class Vote extends React.Component {
 }
 
 class Save extends React.Component {
+    // 2 types (prop): post and comment.
     constructor(props) {
         super(props);
         this.state = {
             isSaved: this.props.isSaved,
-            isSaving: false
         };
+        this.isSaving = false;
         this.handleClick = this.handleClick.bind(this);
     }
     handleClick(e) {
         e.preventDefault();
-        if (this.state.isSaving) return;
+        if (this.isSaving) return;
 
+        const link = this.props.type === 'post' ? '/savePost' : '/saveComment';
         const successAction = () => {
-            this.setState({isSaving: false, isSaved: !this.state.isSaved});
+            this.isSaving = false;
+            this.setState({isSaved: !this.state.isSaved});
         };
         const failedAction = () => {
-            this.setState({isSaving: false})
+            this.isSaving = false;
         };
-        this.setState({isSaving: true});
-        fetch('/savepost', {
+
+        this.isSaving = true;
+        fetch(link, {
             method: 'POST',
             body: JSON.stringify({id: this.props.postId, isCancel: this.state.isSaved}),
             headers:{
@@ -286,15 +306,14 @@ function Reply(props){
 class Hide extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            isHiding: false
-        };
+        this.isHiding = false;
         this.handleHide = this.handleHide.bind(this);
     }
     handleHide() {
-        if (this.state.isHiding) return;
+        if (this.isHiding) return;
 
-        fetch('/hidepost', {
+        const link = this.props.type === 'post' ? '/hidePost' : '/hideComment';
+        fetch(link, {
             method: 'POST',
             body: JSON.stringify({id: this.props.postId}),
             headers:{
@@ -306,17 +325,17 @@ class Hide extends React.Component {
             .then(json => {
                 if (json === '111') {
                     window.open('/login', 'iframe-s');
-                    this.setState({isHiding: false});
+                    this.isHiding = false;
                 } else if (json === '154') {
                     // success
-                    this.setState({isHiding: false, isHidden: true});
+                    this.isHiding = false;
                     window.location.reload();
                 } else {
                     // failed
-                    this.setState({isHiding: false});
+                    this.isHiding = false;
                 }
             })
-            .catch(err => this.setState({isHiding: false}));
+            .catch(err => this.isHiding = false);
     };
     render() {
         return (

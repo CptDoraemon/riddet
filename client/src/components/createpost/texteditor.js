@@ -144,6 +144,7 @@ function replySubmitHandler(e) {
                 this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
             } else if (json === '130') {
                 this.setState({response: 'Submitted!'});
+                window.location.reload();
             }
         })
         .catch((e) => {

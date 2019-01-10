@@ -308,7 +308,7 @@ module.exports = function (app, db) {
         }
     );
 
-    app.post('/upvote', (req, res, next) => {
+    app.post('/upVote', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         const postId = ObjectId(req.body.id);
@@ -335,7 +335,34 @@ module.exports = function (app, db) {
         })();
     });
 
-    app.post('/downvote', (req, res, next) => {
+    app.post('/upVoteComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const commentId = ObjectId(req.body.id);
+        const userId = req.user._id.toString();
+        const isCancel = req.body.isCancel;
+        (async function() {
+            try {
+                let upVotes = await db.collection('comments').findOne({_id: commentId});
+                let upVotesArray =  upVotes.upVotes ? upVotes.upVotes.slice() : [];
+                const index =  upVotesArray.indexOf(userId);
+                // cancel existing vote
+                if (isCancel) {
+                    if (index !== -1) upVotesArray.splice(index, 1);
+                } else {
+                    // new vote
+                    if (index === -1) upVotesArray.push(userId);
+                }
+                await db.collection('comments').updateOne({_id: commentId}, {$set: {upVotes: upVotesArray}});
+                res.json('150');
+            } catch (err) {
+                console.log(err);
+                res.json('151');
+            }
+        })();
+    });
+
+    app.post('/downVote', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         const postId = ObjectId(req.body.id);
@@ -362,7 +389,34 @@ module.exports = function (app, db) {
         })();
     });
 
-    app.post('/savepost', (req, res, next) => {
+    app.post('/downVoteComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const commentId = ObjectId(req.body.id);
+        const userId = req.user._id.toString();
+        const isCancel = req.body.isCancel;
+        (async function() {
+            try {
+                let downVotes = await db.collection('comments').findOne({_id: commentId});
+                let downVotesArray =  downVotes.downVotes ? downVotes.downVotes.slice() : [];
+                const index =  downVotesArray.indexOf(userId);
+                // cancel existing vote
+                if (isCancel) {
+                    if (index !== -1) downVotesArray.splice(index, 1);
+                } else {
+                    // new vote
+                    if (index === -1) downVotesArray.push(userId);
+                }
+                await db.collection('comments').updateOne({_id: commentId}, {$set: {downVotes: downVotesArray}});
+                res.json('150');
+            } catch (err) {
+                console.log(err);
+                res.json('151');
+            }
+        })();
+    });
+
+    app.post('/savePost', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         const postId = req.body.id.toString();
@@ -388,7 +442,33 @@ module.exports = function (app, db) {
         })();
     });
 
-    app.post('/hidepost', (req, res, next) => {
+    app.post('/saveComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const commentId = req.body.id.toString();
+        const userId = req.user._id;
+        const isCancel = req.body.isCancel;
+        (async function() {
+            try {
+                let savedComments = req.user.savedComments ? req.user.savedComments.slice() : [];
+                const index =  savedComments.indexOf(commentId);
+                if (isCancel) {
+                    // cancel existing save
+                    if (index !== -1) savedComments.splice(index, 1)
+                } else {
+                    // add new save post
+                    if (index === -1) savedComments.push(commentId);
+                }
+                await db.collection('users').updateOne({_id: userId}, {$set: {savedComments : savedComments}});
+                res.json('152');
+            } catch (err) {
+                console.log(err);
+                res.json('153');
+            }
+        })();
+    });
+
+    app.post('/hidePost', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
     }, (req, res) => {
         const postId = req.body.id.toString();
@@ -399,6 +479,25 @@ module.exports = function (app, db) {
                 const index =  hiddenPosts.indexOf(postId);
                 if (index === -1) hiddenPosts.push(postId);
                 await db.collection('users').updateOne({_id: userId}, {$set: {hiddenPosts : hiddenPosts}});
+                res.json('154');
+            } catch (err) {
+                console.log(err);
+                res.json('155');
+            }
+        })();
+    });
+
+    app.post('/hideComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const commentId = req.body.id.toString();
+        const userId = req.user._id;
+        (async function() {
+            try {
+                let hiddenComments = req.user.hiddenComments ? req.user.hiddenComments.slice() : [];
+                const index =  hiddenComments.indexOf(commentId);
+                if (index === -1) hiddenComments.push(commentId);
+                await db.collection('users').updateOne({_id: userId}, {$set: {hiddenComments : hiddenComments}});
                 res.json('154');
             } catch (err) {
                 console.log(err);

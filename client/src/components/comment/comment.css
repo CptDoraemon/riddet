@@ -1,6 +1,7 @@
 .comment-template-wrapper {
     background-color: rgb(219, 224, 229);
     width: 100vw;
+    max-width: 100%;
     min-height: 100vh;
     min-width: 100px;
     display: flex;
@@ -13,6 +14,7 @@
     width: calc(100% - 50px);
     margin: 20px 0;
     border-radius: 5px;
+    overflow: hidden; /* for reply indentation */
 }
 .comment-post-wrapper {
     width: 100%;
@@ -60,7 +62,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    color: grey;
+    color: rgba(0,0,0,0.3);
 }
 .comment-post-buttons-item {
     display: flex;
