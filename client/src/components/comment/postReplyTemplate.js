@@ -4,6 +4,7 @@ import '../card.css';
 import { Vote, Save, Edit, Share, CommentUnclickable, Hide, Report, Reply } from "../buttons/cardButtons";
 import { PostParser } from "../createpost/postparser";
 import {ReplyTextEditor} from '../createpost/texteditor';
+import {flattenArray} from "../tools/nestedArrayTools";
 const calcDateDiffMessage = require('../tools/dateCalculation').calcDateDiffMessage;
 
 // Post is the main post in comment page
@@ -29,6 +30,7 @@ class Post extends React.Component {
         const count = upVotes - downVotes;
         const buttonClassName = 'comment-post-buttons-item';
         const post = this.props.data.post;
+        const commentCount = this.props.data.comments ? flattenArray(this.props.data.comments).length : 0;
 
 
         return (
@@ -60,7 +62,7 @@ class Post extends React.Component {
                     </div>
 
                     <div className='comment-post-buttons'>
-                        <CommentUnclickable className={buttonClassName} size={buttonSize} />
+                        <CommentUnclickable className={buttonClassName} size={buttonSize} commentCount={commentCount}/>
 
                         <Share className={buttonClassName} size={buttonSize} link={window.location.href} icon={true}/>
 

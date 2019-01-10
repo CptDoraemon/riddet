@@ -22,13 +22,18 @@ class Index extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            iFrameLTitle: 'loading...',
             isLogin: false,
             user: {
                 username: null,
-            }
+            },
         };
         this.verifyAuthentication = this.verifyAuthentication.bind(this);
+        this.setIFrameLTitle = this.setIFrameLTitle.bind(this);
     }
+    setIFrameLTitle(title){
+        this.setState({iFrameLTitle: title})
+    };
     verifyAuthentication() {
         fetch('/verifyAuthentication', {
             method: 'GET',
@@ -67,7 +72,7 @@ class Index extends React.Component {
             <Router>
                 <ScrollToTop>
                     <Switch>
-                        <Route path="/" exact render={(props) => <Frontpage {...props} {...authenticationTools} {...themeTools} />} />
+                        <Route path="/" exact render={(props) => <Frontpage {...props} {...authenticationTools} {...themeTools} setIFrameLTitle={this.setIFrameLTitle}/>} />
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
@@ -75,7 +80,7 @@ class Index extends React.Component {
                     </Switch>
 
                     <IFrameS />
-                    <IFrameL />
+                    <IFrameL title={this.state.iFrameLTitle}/>
                 </ScrollToTop>
             </Router>
         )

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import './card.css';
 import { Vote, Save, HideAndReport, Edit, Share, CommentClickable } from './buttons/cardButtons';
 import { PostParser } from "./createpost/postparser";
+import { flattenArray } from "./tools/nestedArrayTools";
 
 
 class Card extends React.Component {
@@ -75,7 +76,7 @@ class Card extends React.Component {
             title,
             post,
             date,
-            comments,
+            commentCount,
             upVotes,
             downVotes,
             postId,
@@ -88,7 +89,7 @@ class Card extends React.Component {
             data.title,
             data.post,
             data.date,
-            data.comments ? data.comments.length : 0,
+            data.comments ? flattenArray(data.comments).length : 0,
             data.upVotes ? data.upVotes.length : 0,
             data.downVotes ? data.downVotes.length : 0,
             data._id,
@@ -155,7 +156,7 @@ class Card extends React.Component {
                         </div>
                         <div className='card-body-bottombar'>
 
-                            <CommentClickable postId={postId} className='card-body-bottombar-item'/>
+                            <CommentClickable postId={postId} className='card-body-bottombar-item' commentCount={commentCount} postTitle={title} setIFrameLTitle={this.props.setIFrameLTitle}/>
 
                             <Share className='card-body-bottombar-item' size={buttonSize} link={window.location.href + 'comment/' + postId} icon={true}/>
 

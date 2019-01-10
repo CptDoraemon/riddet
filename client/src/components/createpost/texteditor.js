@@ -52,7 +52,7 @@ function postSubmitHandler (e) {
         const data = {
             username: this.props.username,
             title: this.state.teTitle,
-            post: this.state.tePost
+            post: this.state.tePost === this.tePostDefault ? '' : this.state.tePost,
         };
         this.setState({isSubmitting: true});
         fetch('/createpost', {

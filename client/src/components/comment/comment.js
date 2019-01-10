@@ -25,7 +25,6 @@ function Login (props) {
 function ReplyPosts(props) {
 
     let renderArray = [];
-    console.log(props.data);
     let indentation = -1;
 
     function renderPost(array) {

@@ -71,6 +71,7 @@
     line-height: 25px;
     color: white;
     overflow: hidden;
+    font-weight: bold;
 }
 .iframe-l-headbar-close {
     width: 100px;

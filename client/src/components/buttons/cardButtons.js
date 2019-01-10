@@ -274,22 +274,49 @@ class Share extends React.Component {
     }
 }
 
-function CommentClickable (props) {
-    return (
-        <a href={'/comment/' + props.postId} target='iframe-l'>
-            <div className={props.className}>
-                <MdComment size={props.size}/>
-                <span>comment</span>
+class CommentClickable extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
+    handleClick(e) {
+        e.preventDefault();
+        window.open('/comment/' + this.props.postId, 'iframe-l');
+        this.props.setIFrameLTitle(this.props.postTitle);
+    }
+    render() {
+        const commentCount = this.props.commentCount;
+        return (
+            <div onClick={this.handleClick}>
+                <div className={this.props.className}>
+                    <MdComment size={this.props.size}/>
+
+                    { commentCount === 0 ?
+                        <span>comment</span> :
+                        commentCount === 1 ?
+                            <span>1 comment</span> :
+                            <span>{commentCount} comments</span>
+                    }
+
+                </div>
             </div>
-        </a>
-    )
+        )
+    }
 }
 
 function CommentUnclickable (props) {
+    const commentCount = props.commentCount;
     return (
         <div className={props.className}>
             <MdComment size={props.size}/>
-            <span>comment</span>
+
+            { commentCount === 0 ?
+                <span>comment</span> :
+                commentCount === 1 ?
+                    <span>1 comment</span> :
+                    <span>{commentCount} comments</span>
+            }
+
         </div>
     )
 }

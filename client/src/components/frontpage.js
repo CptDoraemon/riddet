@@ -10,7 +10,7 @@ function Cards (props) {
     const data = props.postData;
     if (data.length !== 0) {
         // i is posts objects
-        let posts = data.map((i) => <Card key={i._id} data={{...i}} />);
+        let posts = data.map((i) => <Card key={i._id} data={{...i}} setIFrameLTitle={props.setIFrameLTitle}/>);
         return posts
     } else {
         return null
@@ -98,7 +98,7 @@ class Frontpage extends React.Component {
                     <div className='main-content-wrapper-box'>
                         <div className='posts-wrapper' id='postContainer'>
 
-                            <Cards postData={this.state.postData} />
+                            <Cards postData={this.state.postData} setIFrameLTitle={this.props.setIFrameLTitle}/>
                             { this.state.loadingPost ? <Loading /> : null }
                             { this.state.loadingPostSuccess ? null : <LoadingFailed/> }
                             <div ref={this.loadingRef} />

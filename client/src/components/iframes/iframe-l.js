@@ -37,7 +37,7 @@ class IFrameL extends React.Component{
                 <div className='iframe-l-bodywrapper' onClick={this.preventClose}>
                     <div className='iframe-l-headbar'>
                         <div className='iframe-l-headbar-title'>
-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123
+                            { this.props.title }
                         </div>
                         <div className='iframe-l-headbar-close' onClick={this.close}>
                             <IoIosClose size='25px'/>
