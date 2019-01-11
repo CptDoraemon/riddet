@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
 import './card.css';
 import { Vote, Save, HideAndReport, Edit, Share, CommentClickable } from './buttons/cardButtons';
 import { PostParser } from "./createpost/postparser";
@@ -83,7 +82,8 @@ class Card extends React.Component {
             isUpVoted,
             isDownVoted, // By current login user
             isSaved,
-            isEditable
+            isEditable,
+            isEdited,
         ] = [
             data.username,
             data.title,
@@ -96,7 +96,8 @@ class Card extends React.Component {
             data.isUpVoted,
             data.isDownVoted,
             data.isSaved,
-            data.isEditable
+            data.isEditable,
+            data.isEdited ? data.isEdited : false
         ];
 
         // date calculations
@@ -141,6 +142,7 @@ class Card extends React.Component {
                             <p>Posted by
                                 <span> u/{username}</span>
                                 <span> {dateDiffMessage}</span>
+                                {isEdited ? <span> *Edited*</span> : null}
                             </p>
                         </div>
                         <div
@@ -162,7 +164,7 @@ class Card extends React.Component {
 
                             <Save className='card-body-bottombar-item' isSaved={isSaved} postId={postId} size={buttonSize} icon={true} type='post'/>
 
-                            { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' icon={true}/> : null }
+                            { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' icon={true} type='post' id={postId}/> : null }
 
                             <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize}/>
 

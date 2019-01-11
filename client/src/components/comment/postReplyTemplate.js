@@ -31,6 +31,7 @@ class Post extends React.Component {
         const buttonClassName = 'comment-post-buttons-item';
         const post = this.props.data.post;
         const commentCount = this.props.data.comments ? flattenArray(this.props.data.comments).length : 0;
+        const isEdited = this.props.data.isEdited ? this.props.data.isEdited : false;
 
 
         return (
@@ -47,6 +48,7 @@ class Post extends React.Component {
                         <p>Posted by
                             <span> u/{this.props.data.username}</span>
                             <span> {dateDiffMessage}</span>
+                            {isEdited ? <span> *Edited*</span> : null}
                         </p>
                     </div>
 
@@ -68,7 +70,7 @@ class Post extends React.Component {
 
                         <Save className={buttonClassName} isSaved={isSaved} postId={postId} size={buttonSize} icon={true} type='post'/>
 
-                        { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={true} /> : null }
+                        { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={true} type='post' id={this.props.postId}/> : null }
 
                         <Hide className={buttonClassName} size={buttonSize} postId={postId} icon={true} type='post'/>
 
@@ -118,6 +120,7 @@ class ReplyPost extends React.Component {
         const count = upVotes - downVotes;
         const buttonClassName = 'comment-post-buttons-item';
         const comment = this.props.data.comment;
+        const isEdited = this.props.data.isEdited ? this.props.data.isEdited : false;
 
         const replyIndentationCSS = {
             marginLeft: this.props.identation*35 + 'px',
@@ -141,6 +144,12 @@ class ReplyPost extends React.Component {
                             <span> { count === 0 ? count + ' point' : count + ' points'}</span>
                             <span> &middot; </span>
                             <span> {dateDiffMessage}</span>
+                            { isEdited ?
+                                <span> &middot; </span> :
+                                null }
+                            { isEdited ?
+                                <span>*Edited*</span> :
+                                null }
                         </div>
 
                         {/* no title */}
@@ -160,7 +169,7 @@ class ReplyPost extends React.Component {
 
                             <Save className={buttonClassName} isSaved={isSaved} postId={commentId} size={buttonSize} icon={false} type='comment'/>
 
-                            { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={false} /> : null }
+                            { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={false} type='comment' id={commentId}/> : null }
 
                             <Hide className={buttonClassName} size={buttonSize} postId={commentId} icon={false}/>
 

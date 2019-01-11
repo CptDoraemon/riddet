@@ -16,7 +16,7 @@ module.exports = function (app, db) {
 
     // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
     // 104 email taken; 105 username taken; 106 database error
-    // 110 login success; 111 login failed
+    // 110 login success; 111 login failed; 112 qualified to edit; 113 not qualified to edit
     // 120 logout success
     // 130 create post/reply success, 131 post/reply invalid, 133 reply/post failed
     // 140 no more new posts
@@ -152,6 +152,55 @@ module.exports = function (app, db) {
                 res.json('130');
             }
         })
+    });
+
+    app.post('/updatePostOrComment', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        (async function() {
+            try {
+                const id = ObjectId(req.body.id);
+                const type = req.body.type;
+                const title = req.body.title;
+                const post = req.body.post;
+                const collection = type + 's';
+
+                // data validation
+                if (type === 'post') {
+                    if (req.body.title === '' || req.body.title === 'Title (required)') {
+                        res.json('131');
+                        return
+                    }
+                } else if (type === 'comment') {
+                    if (req.body.post === '' || req.body.post === 'What are your thoughts?') {
+                        res.json('131');
+                        return
+                    }
+                }
+
+                // check qualification
+                const doc = await db.collection(collection).findOne({_id: id});
+                const author = doc.username;
+                if (author !== req.user.username) {
+                    res.json('113');
+                    return
+                }
+
+                // update
+                if (type === 'post') {
+                    await db.collection(collection).updateOne({_id: id},
+                        {$set: {title: title, post: post, isEdited: true}})
+                } else if (type === 'comment') {
+                    await db.collection(collection).updateOne({_id: id},
+                        {$set: {comment: post, isEdited: true}})
+                }
+
+                res.json('130')
+            } catch (err) {
+                console.log(err);
+                res.json('106');
+            }
+        })();
     });
 
     app.post('/replyToPost', (req, res, next) => {
@@ -343,8 +392,8 @@ module.exports = function (app, db) {
         const isCancel = req.body.isCancel;
         (async function() {
             try {
-                let upVotes = await db.collection('comments').findOne({_id: commentId});
-                let upVotesArray =  upVotes.upVotes ? upVotes.upVotes.slice() : [];
+                let comment = await db.collection('comments').findOne({_id: commentId});
+                let upVotesArray =  comment.upVotes ? comment.upVotes.slice() : [];
                 const index =  upVotesArray.indexOf(userId);
                 // cancel existing vote
                 if (isCancel) {
@@ -598,6 +647,36 @@ module.exports = function (app, db) {
                 res.json(comments);
             } catch (err) {
                 console.log(err);
+            }
+        })();
+    });
+
+    app.post('/verifyEditQualification', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const type = req.body.type;
+        const id = ObjectId(req.body.id);
+        const username = req.user.username;
+        let collection;
+        if (type === 'post') {
+            collection = 'posts'
+        } else if (type === 'comment') {
+            collection = 'comments'
+        }
+        (async function() {
+            try {
+                const doc = await db.collection(collection).findOne({_id: id});
+                const author = doc.username;
+                // success response
+                const response = {
+                    code: '112',
+                    title: type === 'post' ? doc.title : null,
+                    content: type === 'post' ? doc.post : doc.comment,
+                };
+                author === username ? res.json(response) : res.json('113');
+            } catch (err) {
+                console.log(err);
+                res.json('106');
             }
         })();
     });

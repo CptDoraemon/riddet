@@ -4,7 +4,6 @@ import {CommentTextEditor} from '../createpost/texteditor';
 import {Post, ReplyPost} from "./postReplyTemplate";
 
 const nestedArrayTools = require('../tools/nestedArrayTools');
-const searchByFlattenIndex = nestedArrayTools.searchByFlattenIndex;
 const replaceByFlattenIndex = nestedArrayTools.replaceByFlattenIndex;
 const flattenArray = nestedArrayTools.flattenArray;
 
@@ -48,9 +47,7 @@ function ReplyPosts(props) {
     }
 
     renderPost(props.data);
-    const render = renderArray.map((j) => j);
-    return render;
-
+    return renderArray.map((j) => j);
 }
 
 

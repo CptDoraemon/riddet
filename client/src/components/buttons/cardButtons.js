@@ -2,6 +2,7 @@ import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
 import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage, MdEdit, MdReply } from "react-icons/md";
+import { Link } from 'react-router-dom';
 import '../header.css';
 
 class Vote extends React.Component {
@@ -224,11 +225,15 @@ class HideAndReport extends React.Component {
 }
 
 function Edit (props) {
+    const postOrComment = props.type === 'post' ? 'post' : 'comment';
+    const link = '/editPost/' + postOrComment + '/' + props.id;
     return (
-        <div className={props.className}>
-            { props.icon ? <MdEdit size={props.size}/> : null }
-            <span>Edit</span>
-        </div>
+        <Link to={link} target='_blank'>
+            <div className={props.className}>
+                { props.icon ? <MdEdit size={props.size}/> : null }
+                <span>Edit</span>
+            </div>
+        </Link>
     )
 }
 

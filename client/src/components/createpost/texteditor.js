@@ -113,7 +113,7 @@ function commentSubmitHandler (e) {
             console.log(e);
             this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
         });
-};
+}
 function replySubmitHandler(e) {
     e.preventDefault();
     if (!this.props.isLogin) {
@@ -153,22 +153,65 @@ function replySubmitHandler(e) {
         });
 }
 
+function editHandler (e) {
+    e.preventDefault();
+    if (!this.props.isLogin) {
+        window.open('/login', 'iframe-s');
+        return
+    }
+    const data = {
+        id: this.props.id,
+        type: this.props.type,
+        title: this.state.teTitle,
+        post: this.state.tePost === this.tePostDefault ? '' : this.state.tePost,
+    };
+    this.setState({isSubmitting: true});
+    fetch('/updatePostOrComment', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        credentials: "same-origin"
+    })
+        .then(res => res.json())
+        .then(json => {
+            if (json === '111') {
+                window.open('/login', 'iframe-s');
+                this.setState({isSubmitting: false});
+            } else if (json === '113') {
+                this.setState({response: 'This is not your ' + this.props.type + '!', isSubmitting: false});
+            } else if (json === '106' || json === '131') {
+                this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+            } else if (json === '130') {
+                this.setState({response: 'Submitted!'});
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+            this.setState({response: 'Oops, something unexpected happened, maybe try again?', isSubmitting: false});
+        });
+}
+
 const PostTextEditor = textEditorHOC(postSubmitHandler, 'post');
 const CommentTextEditor = textEditorHOC(commentSubmitHandler, 'comment', false, true, 'What are your thoughts?');
 const ReplyTextEditor = textEditorHOC(replySubmitHandler, 'reply', false, true, 'What are your thoughts?');
+const PostEditPostTextEditor = textEditorHOC(editHandler, 'submit change');
+const CommentEditPostTextEditor = textEditorHOC(editHandler, 'submit change', false, false, 'What are your thoughts?');
 
 
 function textEditorHOC (submitHandler,
                         button,
                         requireTitle = true,
                         shorterTextarea = false,
-                        textareaDefault = 'Text (optional)',) {
+                        textareaDefault = 'Text (optional)',
+                        ) {
     return class extends React.Component {
         constructor(props) {
             super(props);
             this.state = {
-                teTitle: 'Title (required)',
-                tePost: textareaDefault,
+                teTitle: this.props.title ? this.props.title : 'Title (required)',
+                tePost: this.props.content ? this.props.content : textareaDefault,
                 bold: false,
                 italic: false,
                 spoiler: false,
@@ -468,4 +511,4 @@ function getActualHeight(el) {
     return height;
 }
 
-export { PostTextEditor, CommentTextEditor, ReplyTextEditor };
+export { PostTextEditor, CommentTextEditor, ReplyTextEditor, PostEditPostTextEditor, CommentEditPostTextEditor };

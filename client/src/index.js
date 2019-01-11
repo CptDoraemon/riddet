@@ -12,7 +12,7 @@ import { IoIosBonfire } from "react-icons/io";
 import { Frontpage } from './components/frontpage';
 import { Login } from './components/forms/login';
 import { Signup } from './components/forms/signup';
-import { Createpost } from './components/createpost/createpost';
+import { Createpost, EditPost } from './components/createpost/createpost';
 import { CommentTemplate } from "./components/comment/comment";
 import { IFrameS } from "./components/iframes/iframe-s";
 import { IFrameL } from "./components/iframes/iframe-l";
@@ -76,7 +76,8 @@ class Index extends React.Component {
                         <Route path="/login" exact render={(props) => <Login {...props} /> } />
                         <Route path="/signup" exact render={(props) => <Signup {...props} /> } />
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
-                        <Route path="/comment/:postId" render={(props) => <CommentTemplate {...props} {...authenticationTools} {...themeTools}/> } />
+                        <Route path="/editPost/:postOrComment/:id" exact render={(props) => <EditPost {...props} {...authenticationTools} {...themeTools}/> } />
+                        <Route path="/comment/:postId" exact render={(props) => <CommentTemplate {...props} {...authenticationTools} {...themeTools}/> } />
                     </Switch>
 
                     <IFrameS />
