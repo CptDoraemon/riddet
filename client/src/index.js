@@ -14,6 +14,7 @@ import { Login } from './components/forms/login';
 import { Signup } from './components/forms/signup';
 import { Createpost, EditPost } from './components/createpost/createpost';
 import { CommentTemplate } from "./components/comment/comment";
+import { AccountSetting } from './components/accountSetting/accountSetting';
 import { IFrameS } from "./components/iframes/iframe-s";
 import { IFrameL } from "./components/iframes/iframe-l";
 
@@ -26,6 +27,7 @@ class Index extends React.Component {
             isLogin: false,
             user: {
                 username: null,
+                userId: null,
             },
         };
         this.verifyAuthentication = this.verifyAuthentication.bind(this);
@@ -44,7 +46,7 @@ class Index extends React.Component {
             }
         ).then(res => res.json())
             .then(json => {
-                if (json.code === '110') this.setState({ isLogin: true, user: {...this.state.user, username: json.username} });
+                if (json.code === '110') this.setState({ isLogin: true, user: {...this.state.user, username: json.username, userId: json.userId} });
                 if (json.code === '111') this.setState({ isLogin: false });
             })
             .catch((err) => console.log(err))
@@ -78,6 +80,7 @@ class Index extends React.Component {
                         <Route path="/createpost" exact render={(props) => <Createpost {...props} {...authenticationTools} {...themeTools}/> } />
                         <Route path="/editPost/:postOrComment/:id" exact render={(props) => <EditPost {...props} {...authenticationTools} {...themeTools}/> } />
                         <Route path="/comment/:postId" exact render={(props) => <CommentTemplate {...props} {...authenticationTools} {...themeTools}/> } />
+                        <Route path="/accountSetting/:userId" exact render={(props) => <AccountSetting {...props} {...authenticationTools} {...themeTools}/> } />
                     </Switch>
 
                     <IFrameS />

@@ -119,7 +119,7 @@ module.exports = function (app, db) {
     );
 
     app.get('/verifyAuthentication', (req, res) => {
-        req.isAuthenticated() ? res.json({code: '110', username: req.user.username}) : res.json({code: '111'});
+        req.isAuthenticated() ? res.json({code: '110', username: req.user.username, userId: req.user._id.toString()}) : res.json({code: '111'});
     });
 
     app.get('/logout', (req, res) => {

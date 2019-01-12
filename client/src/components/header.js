@@ -13,7 +13,7 @@ function HeaderFixedLogo (props) {
         <Link to='/'>
             <div className='header-fixed-logo flex-row-even pointer'>
                 <IoIosAnalytics size='30px'/>
-                <span>riddet</span>
+                { props.text ? <span>riddet</span> : null }
             </div>
         </Link>
     )
@@ -140,9 +140,11 @@ class HeaderFixedUser extends React.Component{
         } else {
             return (
                 <React.Fragment>
-                    <div className='header-fixed-user-dropdown-active-item'>
-                        <span>Settings</span>
-                    </div>
+                    <Link to={'/accountSetting/' + this.props.user.userId} target='_blank' >
+                        <div className='header-fixed-user-dropdown-active-item'>
+                            <span>Settings</span>
+                        </div>
+                    </Link>
                     <div className='header-fixed-user-dropdown-active-item' onClick={this.logout}>
                         <span>Log out</span>
                     </div>
@@ -181,7 +183,7 @@ class HeaderFixed extends React.Component {
 
         return (
             <div className='header-fixed flex-row-even'>
-                    <HeaderFixedLogo />
+                    <HeaderFixedLogo text={true}/>
                     <HeaderFixedSubs themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                     <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
                     <HeaderFixedTools />
@@ -360,4 +362,4 @@ class HeaderMax extends React.Component {
     }
 }
 
-export { HeaderMax, HeaderLite};
+export { HeaderMax, HeaderLite, HeaderFixedLogo};
