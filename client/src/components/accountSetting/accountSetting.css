@@ -13,6 +13,7 @@
     height: 50px;
     background-color: white;
     position: fixed;
+    z-index: 9999;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -42,11 +43,12 @@
     transition: 0.3s;
 }
 .account-setting-headbar-item-active {
-    border-bottom: 2px solid black;
+    border-bottom: 5px solid black;
     color: black;
+    line-height: 55px;
 }
 .account-setting-headbar-item-active:hover {
-    border-bottom: 2px solid rgb(54, 121, 204);
+    border-bottom: 5px solid rgb(54, 121, 204);
     color: rgb(54, 121, 204);
     transition: 0.3s;
 }
@@ -55,7 +57,73 @@
 .account-setting-content-wrapper {
     width: 1000px;
     min-height: 100vh;
-    height: 5000px;
-    background-color: black;
     margin: 100px 0 20px 0;
+}
+.account-setting-section-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 20px 0;
+}
+.account-setting-section-title-active {
+    cursor: pointer;
+    text-transform: uppercase;
+    color: rgb(54, 121, 204);
+    font-size: 18px;
+    font-weight: bold;
+    transition: 0.5s;
+}
+.account-setting-section-title-inactive {
+    cursor: pointer;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.3);
+    font-size: 18px;
+    font-weight: bold;
+    transition: 0.5s;
+}
+.account-setting-section-title-icon-active {
+    float: right;
+    color: rgb(54, 121, 204);
+    transform: rotate(90deg);
+    transition: 0.5s;
+}
+.account-setting-section-title-icon-inactive {
+    float: right;
+    color: rgba(0,0,0,0.3);
+    transition: 0.5s;
+}
+.post-entry-wrapper-active {
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    border: 2px solid #e17107;
+    border-radius: 20px;
+    padding: 10px 20px;
+    transition: padding 0.5s, margin 0.5s;
+    cursor: pointer;
+}
+.post-entry-wrapper-active:hover {
+    background-color: rgba(225,113,7,0.1);
+}
+.post-entry-wrapper-inactive {
+    width: calc(100% - 20px);
+    overflow: hidden;
+    margin: 0;
+    border: none;
+    height: 0;
+    padding: 0;
+    visibility: hidden;
+    transition: padding 0.5s, margin 0.5s;
+}
+.post-entry-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+.post-entry-info {
+    color: rgba(0,0,0,0.5);
+    font-size: 10px;
+}
+.post-entry-content {
+    font-size: 12px;
 }
