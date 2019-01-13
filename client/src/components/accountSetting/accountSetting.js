@@ -26,7 +26,8 @@ class AccountSettingHeadbar extends React.Component {
             const el = document.getElementById('accountSettingRef' + i);
             refs.push(el.offsetTop);
         }
-        let currentAtRef = 0;
+        refs[0] = 0;
+        let currentAtRef = -1;
         refs.map((i) => scrolled > i ? currentAtRef++ : null);
         if (currentAtRef !== this.state.currentAtRef) {
             this.setState({currentAtRef: currentAtRef});
