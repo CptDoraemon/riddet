@@ -9,23 +9,39 @@ const toNormalDate = require('../tools/dateCalculation').toNormalDate;
 class AccountSettingHeadbar extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            currentAtRef: 0,
+        };
         this.clickHandler = this.clickHandler.bind(this);
-        this.classNameArrayDefault = (() => {
-            let array = [];
-            for (let i=0; i<8; i++) {
-                array.push('account-setting-headbar-item');
-            }
-            return array
-        })();
+        this.handleScroll = this.handleScroll.bind(this);
     }
     clickHandler(e) {
         const index = e.target.id.match(/\d+/g);
         this.props.scrollTo(index);
     }
+    handleScroll() {
+        const scrolled = window.scrollY + 80;
+        let refs = [];
+        for (let i=0; i<8; i++) {
+            const el = document.getElementById('accountSettingRef' + i);
+            refs.push(el.offsetTop);
+        }
+        let currentAtRef = 0;
+        refs.map((i) => scrolled > i ? currentAtRef++ : null);
+        if (currentAtRef !== this.state.currentAtRef) {
+            this.setState({currentAtRef: currentAtRef});
+        }
+    }
+    componentDidMount() {
+        window.addEventListener('scroll', this.handleScroll);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.handleScroll);
+    }
     render() {
-        let classNameArray = this.classNameArrayDefault.slice();
-        classNameArray[this.props.currentAtRef] = 'account-setting-headbar-item account-setting-headbar-item-active';
         const listNameArray = ['Avatar', 'Password', 'My Posts', 'My Comments', 'Saved Posts', 'Saved Comments', 'Hidden Posts', 'Hidden Comments'];
+        const activeCSS = 'account-setting-headbar-item account-setting-headbar-item-active';
+        const inactiveCSS = 'account-setting-headbar-item';
 
         return (
             <div className='account-setting-headbar-wrapper'>
@@ -35,7 +51,7 @@ class AccountSettingHeadbar extends React.Component {
 
                 { listNameArray.map((i, index) => {
                     return (
-                        <div className={classNameArray[index]} id={'accountSettingNavbar' + index} onClick={this.clickHandler}>
+                        <div className={this.state.currentAtRef === index ? activeCSS : inactiveCSS} id={'accountSettingNavbar' + index} onClick={this.clickHandler}>
                             {i}
                         </div>
                         )
@@ -302,44 +318,14 @@ class AccountSetting extends React.Component {
         super(props);
         this.state = {
             data: {},
-            currentAtRef: 0,
+            refs: [],
         };
         this.userId = this.props.match.params.userId;
-        this.handleScroll = this.handleScroll.bind(this);
         this.scrollTo = this.scrollTo.bind(this);
-        this.ref0 = React.createRef();
-        this.ref1 = React.createRef();
-        this.ref2 = React.createRef();
-        this.ref3 = React.createRef();
-        this.ref4 = React.createRef();
-        this.ref5 = React.createRef();
-        this.ref6 = React.createRef();
-        this.ref7 = React.createRef();
-    }
-    handleScroll() {
-        const scrolled = window.scrollY + 80;
-        if (scrolled < this.ref1.current.offsetTop) {
-            this.setState({currentAtRef: 0})
-        } else if (this.ref1.current.offsetTop < scrolled && scrolled < this.ref2.current.offsetTop) {
-            this.setState({currentAtRef: 1})
-        } else if (this.ref2.current.offsetTop < scrolled && scrolled < this.ref3.current.offsetTop) {
-            this.setState({currentAtRef: 2})
-        } else if (this.ref3.current.offsetTop < scrolled && scrolled < this.ref4.current.offsetTop) {
-            this.setState({currentAtRef: 3})
-        } else if (this.ref4.current.offsetTop < scrolled && scrolled < this.ref5.current.offsetTop) {
-            this.setState({currentAtRef: 4})
-        } else if (this.ref5.current.offsetTop < scrolled && scrolled < this.ref6.current.offsetTop) {
-            this.setState({currentAtRef: 5})
-        } else if (this.ref6.current.offsetTop < scrolled && scrolled < this.ref7.current.offsetTop) {
-            this.setState({currentAtRef: 6})
-        } else if (this.ref7.current.offsetTop < scrolled) {
-            this.setState({currentAtRef: 7})
-        }
     }
     scrollTo(index) {
-        const varName = 'ref' + index;
         window.scrollTo({
-            top: this[varName].current.offsetTop - 79,
+            top: this.state.refs[index] - 79,
             behavior: 'smooth'
         });
     }
@@ -363,35 +349,30 @@ class AccountSetting extends React.Component {
                     this.setState({data: json})
                 }
             }).catch(err => console.log(err));
-
-        window.addEventListener('scroll', this.handleScroll);
-    }
-    componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll);
     }
     render() {
         return (
             <React.Fragment>
                 <div className='account-setting-headbar-backbone'>
-                    <AccountSettingHeadbar themeLogo={this.props.themeLogo} currentAtRef={this.state.currentAtRef} scrollTo={this.scrollTo}/>
+                    <AccountSettingHeadbar themeLogo={this.props.themeLogo} scrollTo={this.scrollTo}/>
                 </div>
                 <div className='account-setting-wrapper'>
                     <div className='account-setting-content-wrapper'>
-                        <div ref={this.ref0}/>
+                        <div id='accountSettingRef0'/>
                         {/*<AvatarSetting />*/}
-                        <div ref={this.ref1}/>
+                        <div id='accountSettingRef1'/>
                         {/*<ChangePassword />*/}
-                        <div ref={this.ref2}/>
+                        <div id='accountSettingRef2'/>
                         <Section sectionName='my posts' type='post' data={this.state.data.userPosts}/>
-                        <div ref={this.ref3}/>
+                        <div id='accountSettingRef3'/>
                         <Section sectionName='my comments' type='comment' data={this.state.data.userComments}/>
-                        <div ref={this.ref4}/>
+                        <div id='accountSettingRef4'/>
                         <Section sectionName='saved posts' type='post' data={this.state.data.savedPosts} unsave={true}/>
-                        <div ref={this.ref5}/>
+                        <div id='accountSettingRef5'/>
                         <Section sectionName='saved comments' type='comment' data={this.state.data.savedComments} unsave={true}/>
-                        <div ref={this.ref6}/>
+                        <div id='accountSettingRef6'/>
                         <Section sectionName='hidden posts' type='post' data={this.state.data.hiddenPosts} unhide={true}/>
-                        <div ref={this.ref7}/>
+                        <div id='accountSettingRef7'/>
                         <Section sectionName='hidden comments' type='comment' data={this.state.data.hiddenComments} unhide={true}/>
                     </div>
 
