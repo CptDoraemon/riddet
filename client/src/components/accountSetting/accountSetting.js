@@ -17,7 +17,10 @@ class AccountSettingHeadbar extends React.Component {
     }
     clickHandler(e) {
         const index = e.target.id.match(/\d+/g);
-        this.props.scrollTo(index);
+        window.scrollTo({
+            top: document.getElementById('accountSettingRef' + index).offsetTop - 79,
+            behavior: 'smooth'
+        });
     }
     handleScroll() {
         const scrolled = window.scrollY + 80;
@@ -319,16 +322,8 @@ class AccountSetting extends React.Component {
         super(props);
         this.state = {
             data: {},
-            refs: [],
         };
         this.userId = this.props.match.params.userId;
-        this.scrollTo = this.scrollTo.bind(this);
-    }
-    scrollTo(index) {
-        window.scrollTo({
-            top: document.getElementById('accountSettingRef' + index).offsetTop - 79,
-            behavior: 'smooth'
-        });
     }
     componentDidMount() {
         fetch('/accountSettingVerification', {
@@ -355,7 +350,7 @@ class AccountSetting extends React.Component {
         return (
             <React.Fragment>
                 <div className='account-setting-headbar-backbone'>
-                    <AccountSettingHeadbar themeLogo={this.props.themeLogo} scrollTo={this.scrollTo}/>
+                    <AccountSettingHeadbar themeLogo={this.props.themeLogo}/>
                 </div>
                 <div className='account-setting-wrapper'>
                     <div className='account-setting-content-wrapper'>
