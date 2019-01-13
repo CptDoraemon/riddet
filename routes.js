@@ -522,11 +522,18 @@ module.exports = function (app, db) {
     }, (req, res) => {
         const postId = req.body.id.toString();
         const userId = req.user._id;
+        const isCancel = req.body.isCancel;
         (async function() {
             try {
                 let hiddenPosts = req.user.hiddenPosts ? req.user.hiddenPosts.slice() : [];
                 const index =  hiddenPosts.indexOf(postId);
-                if (index === -1) hiddenPosts.push(postId);
+                if (isCancel) {
+                    // cancel existing save
+                    if (index !== -1) hiddenPosts.splice(index, 1)
+                } else {
+                    // add new save post
+                    if (index === -1) hiddenPosts.push(postId);
+                }
                 await db.collection('users').updateOne({_id: userId}, {$set: {hiddenPosts : hiddenPosts}});
                 res.json('154');
             } catch (err) {
@@ -541,11 +548,18 @@ module.exports = function (app, db) {
     }, (req, res) => {
         const commentId = req.body.id.toString();
         const userId = req.user._id;
+        const isCancel = req.body.isCancel;
         (async function() {
             try {
                 let hiddenComments = req.user.hiddenComments ? req.user.hiddenComments.slice() : [];
                 const index =  hiddenComments.indexOf(commentId);
-                if (index === -1) hiddenComments.push(commentId);
+                if (isCancel) {
+                    // cancel existing save
+                    if (index !== -1) hiddenComments.splice(index, 1)
+                } else {
+                    // add new save post
+                    if (index === -1) hiddenComments.push(commentId);
+                }
                 await db.collection('users').updateOne({_id: userId}, {$set: {hiddenComments : hiddenComments}});
                 res.json('154');
             } catch (err) {
