@@ -3,6 +3,8 @@ import './accountSetting.css';
 import { HeaderFixedLogo } from "../header";
 import { MdChevronRight } from "react-icons/md";
 
+const toNormalDate = require('../tools/dateCalculation').toNormalDate;
+
 class AccountSettingHeadbar extends React.Component {
     render() {
         return (
@@ -38,19 +40,32 @@ class AccountSettingHeadbar extends React.Component {
         )
     }
 }
-
+function NoEntry(props) {
+    const wrapperClassName = props.isActive ? 'post-entry-wrapper-noentry-active' : 'post-entry-wrapper-noentry-inactive';
+    return (
+        <div className={wrapperClassName}>
+            No Entry
+        </div>
+    )
+}
 function PostEntry (props) {
     const wrapperClassName = props.isActive ? 'post-entry-wrapper-active' : 'post-entry-wrapper-inactive';
     return (
         <div className={wrapperClassName}>
-            <div className='post-entry-info'>Posted by xxxxx date 22-22-22</div>
-            <div className='post-entry-title'>I'm title</div>
-            <div className='post-entry-content'>I'm content</div>
+            <div className='post-entry-info'>Posted by {props.data.username} {toNormalDate(props.data.date)}</div>
+            <div className='post-entry-title'>{props.data.title}</div>
+            <div className='post-entry-content'>{props.data.post}</div>
         </div>
         )
 }
 function CommentEntry (props) {
-
+    const wrapperClassName = props.isActive ? 'post-entry-wrapper-active' : 'post-entry-wrapper-inactive';
+    return (
+        <div className={wrapperClassName}>
+            <div className='post-entry-info'>Posted by {props.data.username} {toNormalDate(props.data.date)}</div>
+            <div className='post-entry-content'>{props.data.comment}</div>
+        </div>
+    )
 }
 class Section extends React.Component {
     constructor(props) {
@@ -73,16 +88,56 @@ class Section extends React.Component {
                         <MdChevronRight size='20px' />
                     </div>
                 </div>
-                <PostEntry isActive={this.state.isDropDown}/>
-                <PostEntry isActive={this.state.isDropDown}/>
-                <PostEntry isActive={this.state.isDropDown}/>
-                <PostEntry isActive={this.state.isDropDown}/>
-                <PostEntry isActive={this.state.isDropDown}/>
+                {
+                    !this.props.data || this.props.data.length === 0 ?
+                    <NoEntry isActive={this.state.isDropDown}/> :
+                    this.props.type === 'post' ?
+                    this.props.data.map((i) => <PostEntry key={i._id} isActive={this.state.isDropDown} data={i}/>) :
+                        this.props.data.map((i) => <CommentEntry key={i._id} isActive={this.state.isDropDown} data={i}/>)
+                }
             </div>
         )
     }
 }
 class AccountSetting extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: {},
+            scrolled: null,
+        };
+        this.userId = this.props.match.params.userId;
+        this.handleScroll = this.handleScroll.bind(this);
+    }
+    handleScroll() {
+        this.setState({scrolled: window.scrollY})
+    }
+    componentDidMount() {
+        fetch('/accountSettingVerification', {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify({userId: this.userId}),
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111'){
+                    window.location.href = '/';
+                } else if (json === '106') {
+
+                } else {
+                    // success
+                    this.setState({data: json})
+                }
+            }).catch(err => console.log(err));
+
+        window.addEventListener('scroll', this.handleScroll);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.handleScroll);
+    }
     render() {
         return (
             <React.Fragment>
@@ -93,12 +148,12 @@ class AccountSetting extends React.Component {
                     <div className='account-setting-content-wrapper'>
                         {/*<AvatarSetting />*/}
                         {/*<ChangePassword />*/}
-                        <Section sectionName='my posts' type='post'/>
-                        <Section sectionName='my comments' type='comment'/>
-                        <Section sectionName='saved posts' type='post'/>
-                        <Section sectionName='saved comments' type='comment'/>
-                        <Section sectionName='hidden posts' type='post'/>
-                        <Section sectionName='hidden comments' type='comment'/>
+                        <Section sectionName='my posts' type='post' data={this.state.data.userPosts}/>
+                        <Section sectionName='my comments' type='comment' data={this.state.data.userComments}/>
+                        <Section sectionName='saved posts' type='post' data={this.state.data.savedPosts}/>
+                        <Section sectionName='saved comments' type='comment' data={this.state.data.savedComments}/>
+                        <Section sectionName='hidden posts' type='post' data={this.state.data.hiddenPosts}/>
+                        <Section sectionName='hidden comments' type='comment' data={this.state.data.hiddenComments}/>
                     </div>
 
                 </div>

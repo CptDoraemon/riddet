@@ -127,3 +127,11 @@
 .post-entry-content {
     font-size: 12px;
 }
+.post-entry-wrapper-noentry-active {
+    transition: 0.5s;
+}
+.post-entry-wrapper-noentry-inactive {
+    visibility: hidden;
+    height: 0;
+    transition: 0.5s;
+}

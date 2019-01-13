@@ -681,6 +681,86 @@ module.exports = function (app, db) {
         })();
     });
 
+    app.post('/accountSettingVerification', (req, res, next) => {
+        const userId = req.body.userId;
+        req.isAuthenticated() && req.user._id.toString() === userId ?
+            next() :
+            res.json('111')
+    }, (req, res) => {
+        const user = req.user;
+        const username = user.username;
+        const data = {
+            savedPosts: user.savedPosts ? [...user.savedPosts] : [],
+            hiddenPosts: user.hiddenPosts ? [...user.hiddenPosts] : [],
+            savedComments: user.savedComments ? [...user.savedComments] : [],
+            hiddenComments: user.hiddenComments ? [...user.hiddenComments] : [],
+        };
+        (async function() {
+            function trimLongPost(array) {
+                const length = 100;
+                array.map((i) => {
+                    if (i.title) {
+                        if (i.title.length > length) i.title = i.title.slice(0, length) + '...';
+                    }
+                    if (i.post) {
+                        if (i.post.length > length) i.post = i.post.slice(0, length) + '...'
+                    }
+                });
+            }
+            function trimLongComment(array) {
+                const length = 100;
+                array.map((i) => {
+                    if (i.comment) {
+                        if (i.comment.length > length) i.comment = i.comment.slice(0, length) + '...';
+                    }
+                })
+            }
+            try {
+                const userPosts = await db.collection('posts').find({username: username}).sort({date: -1}).toArray();
+                const userComments = await db.collection('comments').find({username: username}).sort({date: -1}).toArray();
+                trimLongPost(userPosts);
+                trimLongComment(userComments);
+
+                let savedPosts = [];
+                let hiddenPosts = [];
+                let savedComments = [];
+                let hiddenComments = [];
+                if (data.savedPosts.length !== 0) {
+                    data.savedPosts.map((idString, index, array) => array[index] = ObjectId(idString));
+                    savedPosts = await db.collection('posts').find({_id: {$in: data.savedPosts}}).toArray();
+                    trimLongPost(savedPosts);
+                }
+                if (data.hiddenPosts.length !== 0) {
+                    data.hiddenPosts.map((idString, index, array) => array[index] = ObjectId(idString));
+                    hiddenPosts = await db.collection('posts').find({_id: {$in: data.hiddenPosts}}).toArray();
+                    trimLongPost(hiddenPosts);
+                }
+                if (data.savedComments.length !== 0) {
+                    data.savedComments.map((idString, index, array) => array[index] = ObjectId(idString));
+                    savedComments = await db.collection('comments').find({_id: {$in: data.savedComments}}).toArray();
+                    trimLongComment(savedComments);
+                }
+                if (data.hiddenComments.length !== 0) {
+                    data.hiddenComments.map((idString, index, array) => array[index] = ObjectId(idString));
+                    hiddenComments = await db.collection('comments').find({_id: {$in: data.hiddenComments}}).toArray();
+                    trimLongComment(hiddenComments);
+                }
+                data.savedPosts = savedPosts;
+                data.hiddenPosts = hiddenPosts;
+                data.savedComments = savedComments;
+                data.hiddenComments = hiddenComments;
+                data.userPosts = userPosts ? userPosts : [];
+                data.userComments = userComments ? userComments : [];
+
+                //console.log(data);
+                res.json(data);
+            } catch (err) {
+                console.log(err);
+                res.json('106')
+            }
+        })();
+    });
+
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });

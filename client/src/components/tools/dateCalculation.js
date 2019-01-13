@@ -1,5 +1,6 @@
 module.exports = {
-    calcDateDiffMessage: calcDateDiffMessage
+    calcDateDiffMessage: calcDateDiffMessage,
+    toNormalDate: toNormalDate
 };
 
 function calcDateDiffMessage(inputDate) {
@@ -20,4 +21,9 @@ function calcDateDiffMessage(inputDate) {
         }
     }
     return dateDiffMessage;
+}
+
+function toNormalDate(string) {
+    let obj = new Date(string);
+    return obj.toLocaleString('en-US', { hour12: false });
 }
