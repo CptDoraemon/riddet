@@ -326,7 +326,7 @@ class AccountSetting extends React.Component {
     }
     scrollTo(index) {
         window.scrollTo({
-            top: this.state.refs[index] - 79,
+            top: document.getElementById('accountSettingRef' + index).offsetTop - 79,
             behavior: 'smooth'
         });
     }
