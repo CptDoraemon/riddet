@@ -97,17 +97,12 @@ class AccountSettingInput extends React.Component {
     }
     handleChange(e) {
         const value = e.target.value;
-        let isValid = value !== this.oldValue && value.length <= 20;
-        if (!this.props.allowEmpty) {
-            isValid = isValid && value !== ''
-        }
-        isValid ? this.props.canSubmit(true) : this.props.canSubmit(false);
+        this.props.validationCheck(value, e.target.id);
         this.setState({value: value})
     }
     componentDidMount() {
-        console.log(this.props.oldValue);
-        if (this.props.oldValue !== '') {
-            this.props.canSubmit(false);
+        if (this.props.oldValue && this.props.oldValue !== '') {
+            this.props.validationCheck(this.props.oldValue, null);
             this.setState({value: this.props.oldValue, isLabelMinimized: true, keepLabelMinimized: true});
         }
     }
@@ -132,14 +127,19 @@ class ProfileSetting extends React.Component {
             success: false
         };
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.canSubmit = this.canSubmit.bind(this);
+        this.validationCheck = this.validationCheck.bind(this);
     }
-    canSubmit(status) {
-        if (this.state.canSubmit !== status)
-        this.setState({canSubmit: status})
+    validationCheck(value, id) {
+        let isValid = value !== this.props.oldSignature && value.length <= 20 && value !== '';
+        if (isValid && !this.state.canSubmit) {
+            this.setState({canSubmit: true})
+        }
+        if (!isValid && this.state.canSubmit) {
+            this.setState({canSubmit: false})
+        }
     }
     handleSubmit() {
-        if (this.buttonDisabled) return;
+        if (this.state.isSubmitting) return;
         this.setState({isSubmitting: true});
 
         const signature = document.getElementById('accountSettingSignature').value;
@@ -156,7 +156,7 @@ class ProfileSetting extends React.Component {
                 if (json === '111') {
                     window.location.href = '/'
                 } else if (json === '104') {
-                    this.setState({isSubmitting: false, success: true});
+                    this.setState({success: true});
                 } else {
                     this.setState({isSubmitting: false});
                 }
@@ -175,7 +175,7 @@ class ProfileSetting extends React.Component {
 
                 {/*wait data*/}
                 { this.props.oldSignature || this.props.oldSignature === '' ?
-                    <AccountSettingInput label='Signature (limit 20 characters)' inputId='accountSettingSignature' inputType='text' canSubmit={this.canSubmit} oldValue={this.props.oldSignature} allowEmpty={true}/> :
+                    <AccountSettingInput label='Signature (limit 20 characters)' inputId='accountSettingSignature' inputType='text' validationCheck={this.validationCheck} oldValue={this.props.oldSignature}/> :
                     null
                 }
 
@@ -189,16 +189,89 @@ class ProfileSetting extends React.Component {
     }
 }
 class ChangePassword extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            canSubmit: false,
+            isSubmitting: false,
+            success: false
+        };
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.validationCheck = this.validationCheck.bind(this);
+        this.accountSettingCurrentPassword = '';
+        this.accountSettingNewPassword = '';
+        this.accountSettingConfirmNewPassword = '';
+    }
+    validationCheck(value, id) {
+        this[id] = value;
+
+        const currentPasswordIsValid = this.accountSettingCurrentPassword.length >= 8;
+        const newPasswordIsValid = this.accountSettingNewPassword.length >= 8 && this.accountSettingNewPassword === this.accountSettingConfirmNewPassword;
+        const confirmNewPasswordIsValid = this.accountSettingConfirmNewPassword.length >= 8 && this.accountSettingNewPassword === this.accountSettingConfirmNewPassword;
+        let isValid = currentPasswordIsValid && newPasswordIsValid && confirmNewPasswordIsValid;
+        console.log(this.accountSettingCurrentPassword, currentPasswordIsValid);
+
+        if (isValid && !this.state.canSubmit) {
+            this.setState({canSubmit: true})
+        }
+        if (!isValid && this.state.canSubmit) {
+            this.setState({canSubmit: false})
+        }
+    }
+    handleSubmit() {
+        if (this.isSubmitting) return;
+        this.setState({isSubmitting: true});
+
+        const currentPassword = this.accountSettingCurrentPassword;
+        const newPassword = this.accountSettingNewPassword;
+        const confirmNewPassword = this.accountSettingConfirmNewPassword;
+        const data = {
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            confirmNewPassword: confirmNewPassword
+        };
+
+        fetch('/updatePassword', {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify(data),
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.location.href = '/'
+                } else if (json === '198') {
+                    this.setState({success: true});
+                } else {
+                    this.setState({isSubmitting: false});
+                }
+            }).catch((err) => {
+            console.log(err);
+            this.setState({isSubmitting: false});
+        })
+    }
     render() {
+        const buttonClassName = this.state.canSubmit && !this.state.isSubmitting ? 'account-setting-submit-button' : 'account-setting-submit-button account-setting-submit-button-disabled';
         return (
             <div className='account-setting-section-wrapper'>
-                <div className='account-setting-section-title-active'>
+                <div className='account-setting-section-title-active' >
                     <span> Change Password </span>
                 </div>
+
+                    <AccountSettingInput label='Current Password' inputId='accountSettingCurrentPassword' inputType='password' validationCheck={this.validationCheck} />
+                    <AccountSettingInput label='New Password (At least 8 characters)' inputId='accountSettingNewPassword' inputType='password' validationCheck={this.validationCheck} allowEmpty={true}/>
+                    <AccountSettingInput label='Confirm New Password' inputId='accountSettingConfirmNewPassword' inputType='password' validationCheck={this.validationCheck} />
+
+                    <button className={buttonClassName} onClick={this.handleSubmit} disabled={!this.state.canSubmit || this.state.isSubmitting}> { this.state.success ? 'Success!' : 'Submit' } </button>
+
             </div>
         )
     }
 }
+
 function NoEntry(props) {
     const wrapperClassName = props.isActive ? 'post-entry-wrapper-noentry-active' : 'post-entry-wrapper-noentry-inactive';
     return (

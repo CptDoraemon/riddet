@@ -14,13 +14,14 @@ module.exports = function (app, db) {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });
 
-    // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password; 104 update signature success; 105 update signature failed;
+    // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password;
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed; 112 qualified to edit; 113 not qualified to edit
     // 120 logout success
     // 130 create post/reply success, 131 post/reply invalid, 133 reply/post failed
     // 140 no more new posts
     // 150 vote success, 151 vote failed, 152 save success, 153 save failed, 154 hide success, 155 hide failed
+    // 198 success, 199 failed
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
         if (email.indexOf('@') === -1) {
@@ -112,6 +113,40 @@ module.exports = function (app, db) {
     });
     app.get('/loginFailed', (req, res) => {
         res.json({code: '111'})
+    });
+
+    app.post('/updatePassword', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const currentPassword = req.body.currentPassword;
+        const newPassword = req.body.newPassword;
+        const confirmNewPassword = req.body.confirmNewPassword;
+        console.log(currentPassword, newPassword, confirmNewPassword);
+
+        const currentPasswordIsValid = currentPassword.length >= 8 && currentPassword.indexOf(' ') === -1;
+        const newPasswordIsValid = newPassword.length >= 8 && newPassword.indexOf(' ') === -1 && newPassword === confirmNewPassword && newPassword !== currentPassword;
+        if (!currentPasswordIsValid || !newPasswordIsValid) {
+            res.json('103');
+            return
+        }
+
+        (async function() {
+            try {
+                const hash = await bcrypt.hash(newPassword, 8);
+                const user = await db.collection('users').findOne({_id: req.user._id});
+                const realCurrentPassword = user.password;
+                const authentication = await bcrypt.compare(currentPassword, realCurrentPassword);
+                if (!authentication) {
+                    res.json('103')
+                } else {
+                    await db.collection('users').updateOne({_id: req.user._id}, {$set: {password: hash}});
+                    res.json('198')
+                }
+            } catch (err) {
+                console.log(err);
+                res.json('106')
+            }
+        })();
     });
 
     app.post('/login',
