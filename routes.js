@@ -14,7 +14,7 @@ module.exports = function (app, db) {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });
 
-    // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password
+    // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password; 104 update signature success; 105 update signature failed;
     // 104 email taken; 105 username taken; 106 database error
     // 110 login success; 111 login failed; 112 qualified to edit; 113 not qualified to edit
     // 120 logout success
@@ -301,6 +301,8 @@ module.exports = function (app, db) {
                     let data = oldestPost === null ?
                         await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
                         await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray();
+                    // add user's signature
+
                     // add isUpVoted / isDownVoted if logged in
                     data.map((i) => {
                         i.isUpVoted = false;
@@ -703,7 +705,10 @@ module.exports = function (app, db) {
     }, (req, res) => {
         const user = req.user;
         const username = user.username;
+        const signature = user.signature ? user.signature : '';
         const data = {
+            username: username,
+            signature: signature,
             savedPosts: user.savedPosts ? [...user.savedPosts] : [],
             hiddenPosts: user.hiddenPosts ? [...user.hiddenPosts] : [],
             savedComments: user.savedComments ? [...user.savedComments] : [],
@@ -771,6 +776,24 @@ module.exports = function (app, db) {
             } catch (err) {
                 console.log(err);
                 res.json('106')
+            }
+        })();
+    });
+
+    app.post('/updateSignature', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const signature = req.body.signature;
+        if (req.user.signature === signature) res.json('104');
+        if (signature.length > 20) res.json('105');
+
+        (async function() {
+            try{
+                await db.collection('users').updateOne({_id: req.user._id}, {$set: {signature: signature}});
+                res.json('104');
+            } catch (err) {
+                console.log(err);
+                res.json('105');
             }
         })();
     });
