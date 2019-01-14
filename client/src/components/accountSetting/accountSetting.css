@@ -26,7 +26,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     overflow: hidden;
 }
 .account-setting-headbar-item {
@@ -195,7 +195,7 @@
     line-height: 50px;
     font-size: 20px;
     transition: 0.3s;
-    z-index: 9999;
+    z-index: 99;
 }
 .account-setting-input-label-minimized {
     top: 0;

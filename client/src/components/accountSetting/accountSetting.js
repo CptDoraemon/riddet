@@ -4,6 +4,8 @@ import { HeaderFixedLogo } from "../header";
 import { MdChevronRight } from "react-icons/md";
 import { FiTrash2 } from "react-icons/fi";
 
+const myScrollTo = require('../tools/myScrollTo');
+
 const toNormalDate = require('../tools/dateCalculation').toNormalDate;
 
 class AccountSettingHeadbar extends React.Component {
@@ -17,10 +19,9 @@ class AccountSettingHeadbar extends React.Component {
     }
     clickHandler(e) {
         const index = e.target.id.match(/\d+/g);
-        window.scrollTo({
-            top: document.getElementById('accountSettingRef' + index).offsetTop - 79,
-            behavior: 'smooth'
-        });
+        let y = document.getElementById('accountSettingRef' + index).offsetTop - 79;
+        //window.scrollTo(0, y);
+        myScrollTo(y);
     }
     handleScroll() {
         const scrolled = window.scrollY + 80;
