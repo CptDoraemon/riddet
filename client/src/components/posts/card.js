@@ -1,9 +1,11 @@
 import React from 'react';
 
 import './card.css';
-import { Vote, Save, HideAndReport, Edit, Share, CommentClickable } from './buttons/cardButtons';
-import { PostParser } from "./createpost/postparser";
-import { flattenArray } from "./tools/nestedArrayTools";
+import { Vote, Save, HideAndReport, Edit, Share, CommentClickable } from '../buttons/cardButtons';
+import { PostParser } from "../createpost/postparser";
+import { flattenArray } from "../tools/nestedArrayTools";
+
+const calcDateDiffMessage = require('../tools/dateCalculation').calcDateDiffMessage;
 
 
 class Card extends React.Component {
@@ -13,44 +15,18 @@ class Card extends React.Component {
             contentIsMaxHeight: false,
             unfold: false,
             isHidden: false,
-            isHiding: false
         };
         this.contentRef = React.createRef();
         this.handleHide = this.handleHide.bind(this);
-        this.postId = this.props.data._id;
     }
     unfold() {
         this.setState({
             unfold: true
         })
     }
-    handleHide(e) {
-        e.preventDefault();
-        if (this.state.isHiding) return;
-
-        fetch('/hidepost', {
-            method: 'POST',
-            body: JSON.stringify({id: this.postId}),
-            headers:{
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            credentials: "same-origin"
-        })
-            .then(res => res.json())
-            .then(json => {
-                if (json === '111') {
-                    window.open('/login', 'iframe-s');
-                    this.setState({isHiding: false});
-                } else if (json === '154') {
-                    // success
-                    this.setState({isHiding: false, isHidden: true});
-                } else {
-                    // failed
-                    this.setState({isHiding: false});
-                }
-            })
-            .catch(err => this.setState({isHiding: false}));
-    };
+    handleHide() {
+        this.setState({isHidden: true});
+    }
     handleReport() {
 
     }
@@ -101,22 +77,7 @@ class Card extends React.Component {
         ];
 
         // date calculations
-        const postDate = new Date(date);
-        const nowDate = new Date();
-        let dateDiff = Math.floor((nowDate - postDate) / (1000 * 60)); //minute
-        let dateDiffMessage;
-        dateDiffMessage = dateDiff === 1 ? ' minute ago' : ' minutes ago';
-        dateDiffMessage = dateDiff + dateDiffMessage;
-        if (dateDiff >= 60) {
-            dateDiff = Math.floor(dateDiff / 60); //hour
-            dateDiffMessage = dateDiff === 1 ? ' hour ago' : ' hours ago';
-            dateDiffMessage = dateDiff + dateDiffMessage;
-            if (dateDiff >= 24) {
-                dateDiff = Math.floor(dateDiff / 24); //day
-                dateDiffMessage = dateDiff === 1 ? ' day ago' : ' days ago';
-                dateDiffMessage = dateDiff + dateDiffMessage;
-            }
-        }
+        const dateDiffMessage = calcDateDiffMessage(date);
 
         // vote ClassName
         const voteClassName = {
@@ -166,7 +127,7 @@ class Card extends React.Component {
 
                             { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' icon={true} type='post' id={postId}/> : null }
 
-                            <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize}/>
+                            <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize} id={postId}/>
 
                         </div>
                     </div>

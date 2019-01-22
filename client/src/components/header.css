@@ -33,6 +33,7 @@
 }
 .header-fixed-logo {
     width: 100px;
+    margin: 0 10px;
     color: rgb(54, 121, 204);
 }
 .header-fixed-logo span {
@@ -42,6 +43,7 @@
 }
 .header-fixed-subs {
     width: 250px;
+    margin: 0 10px;
     height: 35px;
     background-color: white;
 }
@@ -56,8 +58,11 @@
     width: 210px;
     font-size: 1em;
 }
+/* 100 + 250 + (300) + 300 + (20 * 4) */
 .header-fixed-search {
-    width: calc(100vw - 950px);
+    margin: 0 10px;
+    width: 100%;
+    padding: 0 20px;
     background-color: rgb(240, 240, 240);
     color: grey;
     border-radius: 5px;
@@ -69,7 +74,7 @@
     margin: 0;
     border: 0;
     height: 100%;
-    width: calc(100vw - 1000px);
+    width: calc(100% - 40px);
     font-size: 1em;
     background-color: inherit;
     color: inherit;
@@ -86,9 +91,11 @@
 }
 .header-fixed-signup-login {
     width: 300px;
+    margin: 0 10px;
 }
 .header-fixed-signup {
     width: 130px;
+    margin: 0 10px;
     height: 35px;
     color: rgb(54, 121, 204);
     background-color: white;
@@ -99,6 +106,7 @@
 }
 .header-fixed-login {
     width: 130px;
+    margin: 0 10px;
     height: 35px;
     color: white;
     background-color: rgb(54, 121, 204);
@@ -111,11 +119,12 @@
 }
 .header-fixed-user {
     position: relative;
+    margin: 0 10px;
 }
 .header-fixed-user-button {
-    height: 35px;
-    width: fit-content;
+    max-width: 260px;
     padding: 0 20px;
+    height: 35px;
     border-radius: 10px;
     border: solid 1px rgb(255, 255, 255);
     color: grey;
@@ -127,6 +136,8 @@
 .header-fixed-user-button-username {
     font-weight: bold;
     width: fit-content;
+    max-width: 200px;
+    overflow: hidden;
     padding: 0 20px 0 5px;
     font-size: 14px;
     color: orange;
@@ -161,8 +172,9 @@
     display: none;
 }
 
-/* sum width except search = 830px */
 
+
+/* */
 .header-fixed-placeholder {
     position: relative;
     z-index: -1;
@@ -320,4 +332,27 @@
     position: absolute;
     top: 100%;
     visibility: hidden;
+}
+
+@media only screen and (max-width: 800px) {
+    .header-fixed-logo {
+        display: none;
+    }
+    .header-fixed-subs {
+        display: none;
+    }
+    .header-fixed-search {
+        margin: 0 5px;
+    }
+    .header-fixed-signup-login {
+        display: none;
+    }
+    .header-fixed-user-button {
+        max-width: 100px;
+        margin: 0 5px;
+        padding: 0 5px;
+    }
+    .header-fixed-user-button-username {
+        display: none;
+    }
 }

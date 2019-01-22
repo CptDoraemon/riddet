@@ -181,7 +181,7 @@ class Save extends React.Component {
             .catch(err => failedAction());
     }
     render() {
-        const icon = this.state.isSaved ? <MdBookmark size='20px'/> : <MdBookmarkBorder size='20px'/>;
+        const icon = this.state.isSaved ? <MdBookmark size={this.props.size}/> : <MdBookmarkBorder size={this.props.size}/>;
         return (
             <div className={this.props.className} onClick={this.handleClick}>
                 { this.props.icon ? icon : null }
@@ -198,10 +198,41 @@ class HideAndReport extends React.Component {
             isDropDown: false
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
+        this.handleHide = this.handleHide.bind(this);
+        this.isHiding = false;
     }
     toggleDropDown() {
         this.setState({isDropDown: !this.state.isDropDown})
     }
+    handleHide() {
+        if (this.isHiding) return;
+
+        this.isHiding = true;
+        fetch('/hidePost', {
+            method: 'POST',
+            body: JSON.stringify({id: this.props.id}),
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.open('/login', 'iframe-s');
+                    this.isHiding = false;
+                } else if (json === '154') {
+                    // success
+                    this.isHiding = false;
+                    // hide this Card
+                    this.props.handleHide();
+                } else {
+                    // failed
+                    this.isHiding = false;
+                }
+            })
+            .catch(err => this.isHiding = false);
+    };
     render() {
         const itemWrapper = this.state.isDropDown ? null : { display: 'none' };
 
@@ -211,7 +242,7 @@ class HideAndReport extends React.Component {
                     { this.state.isDropDown ? <MdFirstPage size={this.props.size}/> : <MdMoreHoriz size={this.props.size}/> }
                 </div>
 
-                <div className={this.props.className} onClick={this.props.handleHide} style={{...itemWrapper}}>
+                <div className={this.props.className} onClick={this.handleHide} style={{...itemWrapper}}>
                     <MdHighlightOff size={this.props.size}/>
                     <span>hide</span>
                 </div>
@@ -291,16 +322,22 @@ class CommentClickable extends React.Component {
     }
     render() {
         const commentCount = this.props.commentCount;
+        const textWithNumber = commentCount === 0 ?
+            <span>comment</span> :
+            commentCount === 1 ?
+                <span>1 comment</span> :
+                <span>{commentCount} comments</span> ;
+
+        const numberOnly = <span>{commentCount}</span>;
+
         return (
             <div onClick={this.handleClick}>
                 <div className={this.props.className}>
                     <MdComment size={this.props.size}/>
 
-                    { commentCount === 0 ?
-                        <span>comment</span> :
-                        commentCount === 1 ?
-                            <span>1 comment</span> :
-                            <span>{commentCount} comments</span>
+                    { !this.props.noText ?
+                        textWithNumber :
+                        numberOnly
                     }
 
                 </div>

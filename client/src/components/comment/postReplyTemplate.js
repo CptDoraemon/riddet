@@ -1,6 +1,6 @@
 import React from "react";
 import './comment.css';
-import '../card.css';
+import '../posts/card.css';
 import { Vote, Save, Edit, Share, CommentUnclickable, Hide, Report, Reply } from "../buttons/cardButtons";
 import { PostParser } from "../createpost/postparser";
 import {ReplyTextEditor} from '../createpost/texteditor';

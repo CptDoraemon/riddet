@@ -3,9 +3,7 @@ import './accountSetting.css';
 import { HeaderFixedLogo } from "../header";
 import { MdChevronRight } from "react-icons/md";
 import { FiTrash2 } from "react-icons/fi";
-
 const myScrollTo = require('../tools/myScrollTo');
-
 const toNormalDate = require('../tools/dateCalculation').toNormalDate;
 
 class AccountSettingHeadbar extends React.Component {

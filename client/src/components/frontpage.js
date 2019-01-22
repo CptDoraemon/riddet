@@ -2,16 +2,35 @@ import React from 'react';
 import './frontpage.css';
 
 import { HeaderMax } from './header';
-import { Card } from './card';
+import { Card } from './posts/card';
+import { Classic } from './posts/classic';
+import { Compact } from './posts/compact';
 import { Info } from './info';
 import { Loading, LoadingFailed, NoMoreLoad } from "./tools/loading";
 
 function Cards (props) {
     const data = props.postData;
-    if (data.length !== 0) {
+    if (data.length) {
         // i is posts objects
-        let posts = data.map((i) => <Card key={i._id} data={{...i}} setIFrameLTitle={props.setIFrameLTitle}/>);
-        return posts
+        return data.map((i) => <Card key={i._id} data={{...i}} setIFrameLTitle={props.setIFrameLTitle}/>);
+    } else {
+        return null
+    }
+}
+function Classics (props) {
+    const data = props.postData;
+    if (data.length) {
+        // i is posts objects
+        return data.map((i) => <Classic key={i._id} data={{...i}} setIFrameLTitle={props.setIFrameLTitle}/>);
+    } else {
+        return null
+    }
+}
+function Compacts (props) {
+    const data = props.postData;
+    if (data.length) {
+        // i is posts objects
+        return data.map((i) => <Compact key={i._id} data={{...i}} setIFrameLTitle={props.setIFrameLTitle}/>);
     } else {
         return null
     }
@@ -91,22 +110,29 @@ class Frontpage extends React.Component {
         window.removeEventListener('scroll', this.loadMore);
     }
     render() {
+        const posts =
+            this.state.view === 'card' ?
+                <Cards postData={this.state.postData} setIFrameLTitle={this.props.setIFrameLTitle}/> :
+                this.state.view === 'classic' ?
+                    <Classics postData={this.state.postData} setIFrameLTitle={this.props.setIFrameLTitle}/> :
+                    <Compacts postData={this.state.postData} setIFrameLTitle={this.props.setIFrameLTitle}/>;
+
+        const postWrapperCSS = this.state.view === 'card' ? 'posts-wrapper' : 'post-wrapper-fullscreen posts-wrapper';
         return (
             <div className='frontpage-wrapper'>
                 <HeaderMax {...this.props} view={this.state.view} toggleView={this.toggleView} sort={this.state.sort} toggleSort={this.toggleSort} />
                 <div className='main-content-wrapper'>
-                    <div className='main-content-wrapper-box'>
-                        <div className='posts-wrapper' id='postContainer'>
+                    <div className={ postWrapperCSS } id='postContainer'>
 
-                            <Cards postData={this.state.postData} setIFrameLTitle={this.props.setIFrameLTitle}/>
-                            { this.state.loadingPost ? <Loading /> : null }
-                            { this.state.loadingPostSuccess ? null : <LoadingFailed/> }
-                            <div ref={this.loadingRef} />
-                            { this.state.noMorePost ? <NoMoreLoad /> : null }
-                        </div>
-                        <div className='infos-wrapper'>
-                            <Info {...this.props} />
-                        </div>
+                        { posts }
+
+                        { this.state.loadingPost ? <Loading /> : null }
+                        { this.state.loadingPostSuccess ? null : <LoadingFailed/> }
+                        <div ref={this.loadingRef} />
+                        { this.state.noMorePost ? <NoMoreLoad /> : null }
+                    </div>
+                    <div className='infos-wrapper'>
+                        <Info {...this.props} />
                     </div>
                 </div>
             </div>

@@ -186,7 +186,7 @@ class HeaderFixed extends React.Component {
                     <HeaderFixedLogo text={true}/>
                     <HeaderFixedSubs themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
                     <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
-                    <HeaderFixedTools />
+                    {/*<HeaderFixedTools />*/}
                     { signup }
                     <HeaderFixedUser isLogin={this.props.isLogin} user={this.props.user}/>
             </div>
