@@ -40,8 +40,8 @@ class Frontpage extends React.Component {
         super(props);
         this.state = {
             view: 'card',
-            sort: 'hot',
-            loadingPost: true,
+            sort: 'new',
+            loadingPost: false,
             loadingPostSuccess: true,
             postData: [],
             noMorePost: false,
@@ -50,49 +50,68 @@ class Frontpage extends React.Component {
         this.toggleView = this.toggleView.bind(this);
         this.toggleSort = this.toggleSort.bind(this);
         this.loadMore = this.loadMore.bind(this);
+        this.requestPosts = this.requestPosts.bind(this);
     }
     toggleView (e) {
         this.setState({
             view: e
         })
     }
-    toggleSort(item) {
+    toggleSort(sortType) {
         this.setState({
-            sort: item
-        })
+            sort: sortType,
+            postData: [],
+            noMorePost: false,
+            loadingPost: false
+        },
+            this.requestPosts);
     }
     requestPosts() {
-        if (this.state.noMorePost) return;
-        this.setState({loadingPost: true, loadingPostSuccess: true});
-        let oldestPost = this.state.postData.length === 0 ? null : this.state.postData[this.state.postData.length - 1].date;
-        oldestPost = {oldestPost: oldestPost};
-        fetch('/getNewPost', {
-            method: 'POST',
-            body: JSON.stringify(oldestPost),
-            headers:{
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            credentials: "same-origin"
-        })
-            .then(res => res.json())
-            .then(json => {
-                let postData = [...this.state.postData];
-                if (json === '140') {
-                    //no more posts
-                    this.setState({noMorePost: true})
-                } else {
-                    json.map((i) => postData.push(i));
-                }
-                this.setState({
-                    postData: postData,
-                    loadingPost: false,
-                    loadingPostSuccess: true
-                });
+        if (this.state.noMorePost || this.state.loadingPost) return;
+
+        let link;
+        if (this.state.sort === 'new') {
+            link = '/getNewPost'
+        } else if (this.state.sort === 'hot') {
+            link = '/getHotPost'
+        } else if (this.state.sort === 'top') {
+            link = '/getTopPost'
+        }
+
+        let lastPostId = this.state.postData.length === 0 ? null : this.state.postData[this.state.postData.length - 1]._id;
+        lastPostId = {lastPostId: lastPostId};
+
+        const sendRequest = () => {
+            fetch(link, {
+                method: 'POST',
+                body: JSON.stringify(lastPostId),
+                headers:{
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                credentials: "same-origin"
             })
-            .catch((err) => {
-                this.setState({loadingPost: false, loadingPostSuccess: false});
-                console.log(err);
-            })
+                .then(res => res.json())
+                .then(json => {
+                    let postData = [...this.state.postData];
+                    if (json === '140') {
+                        //no more posts
+                        this.setState({noMorePost: true})
+                    } else {
+                        json.map((i) => postData.push(i));
+                    }
+                    this.setState({
+                        postData: postData,
+                        loadingPost: false,
+                        loadingPostSuccess: true
+                    });
+                })
+                .catch((err) => {
+                    this.setState({loadingPost: false, loadingPostSuccess: false});
+                    console.log(err);
+                })
+        };
+
+        this.setState({loadingPost: true, loadingPostSuccess: true}, sendRequest);
     }
     loadMore() {
         const scrolledBottom = window.scrollY + window.innerHeight;

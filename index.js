@@ -3,8 +3,8 @@ const mongo = require('mongodb').MongoClient;
 const path = require('path');
 const helmet = require('helmet');
 const session = require('express-session');
-const routes = require('./routes.js');
-const auth = require('./auth.js');
+const routes = require('./server/routes.js');
+const auth = require('./server/auth.js');
 
 const app = express();
 

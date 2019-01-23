@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const ObjectId = require('mongodb').ObjectID;
 
+const requestPosts = require('./APIs/requestPosts');
+
 module.exports = function (app, db) {
 
     app.use(bodyParser.json());
@@ -13,6 +15,8 @@ module.exports = function (app, db) {
     app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname+'/client/build/index.html'));
     });
+
+    requestPosts(app, db);
 
     // 100 email check success; 101 invalid email; 102 invalid username; 103 invalid password;
     // 104 email taken; 105 username taken; 106 database error
@@ -321,78 +325,6 @@ module.exports = function (app, db) {
             }
         })();
     });
-
-    app.post('/getNewPost', (req, res, next) => {
-        req.isAuthenticated();
-        next();
-        }, (req, res) => {
-            const userId = req.user ? req.user._id.toString() : null;
-            let data;
-            let oldestPost = req.body.oldestPost;
-            let date = new Date(oldestPost);
-
-            (async function() {
-                try {
-                    let data = oldestPost === null ?
-                        await db.collection('posts').find({}).sort({date: -1}).limit(5).toArray() :
-                        await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray();
-                    // add user's signature
-
-                    // add isUpVoted / isDownVoted if logged in
-                    data.map((i) => {
-                        i.isUpVoted = false;
-                        i.isDownVoted = false;
-                    });
-                    if (userId !== null) {
-                        data.map((i) => {
-                            if (i.upVotes) {
-                                if (i.upVotes.indexOf(userId) !== -1) i.isUpVoted = true;
-                            }
-                            if (i.downVotes) {
-                                if (i.downVotes.indexOf(userId) !== -1) i.isDownVoted = true;
-                            }
-                        });
-                    }
-                    // add isSaved if logged in
-                    data.map((i) => i.isSaved = false);
-                    if (userId !== null && req.user.savedPosts) {
-                        data.map((i) => req.user.savedPosts.indexOf(i._id.toString()) === -1 ? null : i.isSaved = true);
-                    }
-                    // hide hidden posts if logged in
-                    let dataExcludesHiddenPosts = [];
-                    if (userId !== null && req.user.hiddenPosts) {
-                        data.map((i) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? dataExcludesHiddenPosts.push(i) : null);
-                        //if all the new post got is hidden
-                        while (dataExcludesHiddenPosts.length === 0 && data.length !== 0) {
-                            oldestPost = data[data.length - 1].date;
-                            date = new Date(oldestPost);
-                            data = await db.collection('posts').find({date: {$lt: date}}).sort({date: -1}).limit(5).toArray();
-                            data.map((i) => req.user.hiddenPosts.indexOf(i._id.toString()) === -1 ? dataExcludesHiddenPosts.push(i) : null);
-                        }
-                    } else {
-                        dataExcludesHiddenPosts = [...data]
-                    }
-
-                    // add isEditable if post author is this user
-                    dataExcludesHiddenPosts.map((i) => i.isEditable = false);
-                    if (userId !== null) {
-                        const author = req.user.username;
-                        dataExcludesHiddenPosts.map((i) => {
-                            if (i.username === author) i.isEditable = true
-                        });
-                    }
-
-
-                    dataExcludesHiddenPosts.length === 0 ?
-                        res.json('140') :
-                        res.json(dataExcludesHiddenPosts);
-                } catch (err) {
-                    console.log(err);
-                    res.json('106');
-                }
-            })();
-        }
-    );
 
     app.post('/upVote', (req, res, next) => {
         req.isAuthenticated() ? next() : res.json('111')
