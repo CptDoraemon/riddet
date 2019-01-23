@@ -20,7 +20,7 @@ const uristring = process.env.MONGODB_URI || 'mongodb://test:abcd1234@ds125684.m
 // }
 
 app.use(helmet());
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 mongo.connect(uristring, { useNewUrlParser: true }, (err, client) => {
     let dbName = process.env.DBNAME || 'freecodecamp';
