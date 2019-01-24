@@ -45,39 +45,75 @@ module.exports = function (app, db) {
             req.isAuthenticated();
             next();
         }, (req, res) => {
-        // let data;
-        // let lastPostId = req.body.lastPostId;
-        //
-        // (async function() {
-        //     try {
-        //         if (req.user) {
-        //             let hiddenPosts = req.user.hiddenPosts ? [...req.user.hiddenPosts]: [];
-        //             hiddenPosts = hiddenPosts.map(i => ObjectId(i));
-        //
-        //             data = await db.collection('posts').aggregate([
-        //                 { $match: { _id: { $nin: hiddenPosts } } },
-        //                 { $sort: { date: -1 } },
-        //                 { $match: { _id: { $lt: ObjectId(lastPostId) } } },
-        //                 { $limit: 5 },
-        //             ]).toArray();
-        //             data = addUserSpecificData(data, req.user);
-        //         } else {
-        //             data = await db.collection('posts').aggregate([
-        //                 { $sort: { date: -1 } },
-        //                 { $match: { _id: { $lt: ObjectId(lastPostId) } } },
-        //                 { $limit: 5 },
-        //             ]).toArray();
-        //         }
-        //         data.length === 0 ?
-        //             //no more posts
-        //             res.json('140') :
-        //             res.json(data);
-        //     } catch (err) {
-        //         console.log(err);
-        //         res.json('106');
-        //     }
-        // })();
-    }
+            let data;
+            let lastPostId = req.body.lastPostId;
+
+            (async function() {
+                try {
+                    let hiddenPosts = [];
+                    if (req.user) {
+                        if (req.user.hiddenPosts) hiddenPosts = [...req.user.hiddenPosts];
+                        hiddenPosts = hiddenPosts.map(i => ObjectId(i));
+                    }
+                    // add size of nested comments array
+                    await db.collection('posts').find().forEach((doc) => {
+                        if (doc.comments && doc.comments.length) {
+                            let count = 0;
+                            const loop = (array) => {
+                                for (let i=0; i<array.length; i++) {
+                                    array[i] instanceof Array ? loop(array[i]) : count++
+                                }
+                            };
+                            loop(doc.comments);
+                            db.collection('posts').updateOne({ _id: doc._id}, { $set: { commentsCount: count } });
+                        } else {
+                            db.collection('posts').updateOne({ _id: doc._id}, { $set: { commentsCount: 0 } });
+                        }
+                    });
+                    //
+                    let requestedPostId = [];
+                    let count = 0;
+                    let foundTarget = false;
+                    await db.collection('posts').aggregate([
+                        { $match: { _id: { $nin: hiddenPosts } } },
+                        { $project: { _id: 1, commentsCount: 1, date: 1}},
+                        { $sort: { commentsCount: -1, date: -1 } },
+                    ]).forEach((doc) => {
+                        let postId = doc._id.toString();
+                        // first request:
+                        if (lastPostId === null) {
+                           count++
+                        } else {
+                            // sequential request
+                            if (foundTarget) count++;
+                            if (postId === lastPostId) foundTarget = true;
+                        }
+                        if (1 <= count && count <= 5) {
+                            requestedPostId.push(postId)
+                        }
+                    });
+                    //
+                    data = [];
+                    for(let i=0; i<requestedPostId.length; i++) {
+                        let doc = await db.collection('posts').findOne({ _id: ObjectId(requestedPostId[i]) });
+                        data.push(doc);
+                    }
+
+                    // if logged in, add user specific data
+                    if (req.user) {
+                        data = addUserSpecificData(data, req.user);
+                    }
+
+                    data.length === 0 ?
+                        //no more posts
+                        res.json('140') :
+                        res.json(data);
+                } catch (err) {
+                    console.log(err);
+                    res.json('106');
+                }
+            })();
+        }
     );
 
     app.post('/getHotPost', (req, res, next) => {
