@@ -2,8 +2,10 @@ import React from 'react';
 
 import { GoArrowUp, GoArrowDown } from "react-icons/go";
 import { MdComment, MdShare, MdBookmark, MdBookmarkBorder, MdHighlightOff, MdFlag, MdMoreHoriz, MdFirstPage, MdEdit, MdReply } from "react-icons/md";
+import { IoIosClose } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import '../header.css';
+import './cardButtons.css';
 
 class Vote extends React.Component {
     // it receives props type = 'up' || 'down'
@@ -246,9 +248,8 @@ class HideAndReport extends React.Component {
                     <MdHighlightOff size={this.props.size}/>
                     <span>hide</span>
                 </div>
-                <div className={this.props.className} style={{...itemWrapper}}>
-                    <MdFlag size={this.props.size}/>
-                    <span>report</span>
+                <div style={{...itemWrapper}}>
+                    <Report icon={true} className={this.props.className} size={this.props.size} type={this.props.type} id={this.props.id}/>
                 </div>
             </React.Fragment>
         )
@@ -417,11 +418,140 @@ class Hide extends React.Component {
 }
 
 class Report extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showReportWindow: false,
+            isHide: true,
+            reason: '',
+            isSubmitting: false,
+            isSuccess: false,
+            message: null
+        };
+        this.isLogin = false;
+        this.toggleReportWindow = this.toggleReportWindow.bind(this);
+        this.toggleHide = this.toggleHide.bind(this);
+        this.handleTextareaChange = this.handleTextareaChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    toggleReportWindow() {
+        const toggleFunc = () => {
+            const body = document.getElementsByTagName("BODY")[0];
+
+            if (this.state.showReportWindow) {
+                this.setState({showReportWindow: false}, () => body.style.overflow = 'auto')
+            } else {
+                this.setState({showReportWindow: true}, () => body.style.overflow = 'hidden')
+            }
+        };
+        if (!this.isLogin) {
+            fetch('/verifyAuthentication', {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                credentials: "same-origin"
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === '111') {
+                        window.open('/login', 'iframe-s');
+                    } else {
+                        this.isLogin = true;
+                        toggleFunc()
+                    }
+                })
+                .catch(err => console.log(err));
+        } else {
+            toggleFunc()
+        }
+    };
+    preventWindowClose(e) {
+        e.stopPropagation();
+    }
+    toggleHide() {
+        this.setState({isHide: !this.state.isHide})
+    }
+    handleTextareaChange(e) {
+        this.setState({reason: e.target.value})
+    }
+    handleSubmit(e) {
+        e.preventDefault();
+        if (this.state.isSubmitting) return;
+
+        if (this.state.reason.length > 200) {
+            this.setState({message: 'Reason length exceeds limit.'});
+            return
+        }
+
+        this.setState({message: null, isSubmitting: true});
+        const data = {
+            type: this.props.type,
+            id: this.props.id,
+            reason: this.state.reason,
+            isHide: this.state.isHide
+        };
+        fetch('/submitReport', {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify({data: data}),
+            credentials: "same-origin"
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json === '111') {
+                    window.open('/login', 'iframe-s');
+                } else if (json === '161'){
+                    this.setState({message: 'Reason length exceeds limit.', isSubmitting: false});
+                } else if (json === '155') {
+                    this.setState({message: 'Connection error, please try again later.', isSubmitting: false});
+                } else if (json === '160') {
+                    this.setState({message: 'Thank you for your report, we will handle it soon.', isSubmitting: false, isSuccess: true});
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({message: 'Something unexpected happened, please try again later.', isSubmitting: false});
+            });
+    }
     render() {
+        const postOrComment = this.props.type === 'post' ? 'post' : 'comment';
+        const disableButton = this.state.isSubmitting || this.state.isSuccess;
+        const buttonCSS = disableButton ? 'report-window-submit-disabled' : 'report-window-submit';
+        const reportWindow = (
+            <div className='report-window-fullscreen' onClick={this.toggleReportWindow}>
+                <div className='report-window-wrapper' onClick={this.preventWindowClose}>
+                    <div className='report-window-header'>
+                        <h2>Report</h2>
+                        <div className='report-window-header-close' onClick={this.toggleReportWindow}>
+                            <IoIosClose size='30px' />
+                        </div>
+                    </div>
+                    <form className='report-window-body'>
+                        <h3>Reporting { postOrComment }, id: { this.props.id }</h3>
+                            <div className='report-window-textarea-wrapper'>
+                                <p className='report-window-textarea-label'>Reason (maximum 200 characters):</p>
+                                <textarea className='report-window-textarea' value={this.state.reason} onChange={this.handleTextareaChange}/>
+                            </div>
+                            <div className='report-window-checkbox' onClick={this.toggleHide}>
+                                <input type="checkbox" checked={this.state.isHide} />
+                                <p>Hide this { postOrComment } for you?</p>
+                            </div>
+                        <button className={buttonCSS} disabled={disableButton} onClick={this.handleSubmit}>Submit</button>
+                        <div className='report-window-message'> {this.state.message} </div>
+                    </form>
+                </div>
+            </div>
+        );
         return (
-            <div className={this.props.className}>
-                { this.props.icon ? <MdFlag size={this.props.size}/> : null }
-                <span>report</span>
+            <div>
+                <div className={this.props.className} onClick={this.toggleReportWindow}>
+                    { this.props.icon ? <MdFlag size={this.props.size}/> : null }
+                    <span >report</span>
+                </div>
+                { this.state.showReportWindow ?  reportWindow  : null }
             </div>
         )
     }

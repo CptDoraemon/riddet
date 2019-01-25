@@ -114,7 +114,7 @@ class Classic extends React.Component {
 
                         { isEditable ? <Edit size={buttonSize} className='classic-body-button' icon={true} type='post' id={postId}/> : null }
 
-                        <HideAndReport className='classic-body-button' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize} id={postId}/>
+                        <HideAndReport className='classic-body-button' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize} id={postId} type='post'/>
 
                     </div>
 

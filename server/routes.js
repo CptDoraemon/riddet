@@ -26,6 +26,7 @@ module.exports = function (app, db) {
     // 130 create post/reply success, 131 post/reply invalid, 133 reply/post failed
     // 140 no more new posts
     // 150 vote success, 151 vote failed, 152 save success, 153 save failed, 154 hide success, 155 hide failed
+    // 160 report success, 161 report reason too long
     // 198 success, 199 failed
     app.post('/signup/first', (req, res) => {
         let email = req.body.email;
@@ -158,7 +159,7 @@ module.exports = function (app, db) {
         passport.authenticate('local', { failureRedirect: '/loginFailed', successRedirect: '/loginSuccess' })
     );
 
-    app.get('/verifyAuthentication', (req, res) => {
+    app.post('/verifyAuthentication', (req, res) => {
         req.isAuthenticated() ? res.json({code: '110', username: req.user.username, userId: req.user._id.toString()}) : res.json({code: '111'});
     });
 
@@ -524,10 +525,10 @@ module.exports = function (app, db) {
                 let hiddenComments = req.user.hiddenComments ? req.user.hiddenComments.slice() : [];
                 const index =  hiddenComments.indexOf(commentId);
                 if (isCancel) {
-                    // cancel existing save
+                    // cancel existing hide
                     if (index !== -1) hiddenComments.splice(index, 1)
                 } else {
-                    // add new save post
+                    // add new hide post
                     if (index === -1) hiddenComments.push(commentId);
                 }
                 await db.collection('users').updateOne({_id: userId}, {$set: {hiddenComments : hiddenComments}});
@@ -762,6 +763,45 @@ module.exports = function (app, db) {
             } catch (err) {
                 console.log(err);
                 res.json('105');
+            }
+        })();
+    });
+
+    app.post('/submitReport', (req, res, next) => {
+        req.isAuthenticated() ? next() : res.json('111')
+    }, (req, res) => {
+        const data = req.body.data;
+        const type = data.type;
+        const id = data.id.toString();
+        const reason = data.reason;
+        const isHide = data.isHide;
+        const userId = req.user._id;
+
+        if (reason.length > 200) {
+            res.json('161');
+            return
+        }
+
+        (async function() {
+            try {
+               await db.collection('reports').insertOne({type: type, id: id, reason: reason, reportedByUserId: userId.toString()});
+               if (isHide) {
+                   if (type === 'post') {
+                       let hiddenPosts = req.user.hiddenPosts ? req.user.hiddenPosts.slice() : [];
+                       const index =  hiddenPosts.indexOf(id);
+                       if (index === -1) hiddenPosts.push(id);
+                       await db.collection('users').updateOne({_id: userId}, {$set: {hiddenPosts : hiddenPosts}});
+                   } else if (type === 'comment') {
+                       let hiddenComments = req.user.hiddenComments ? req.user.hiddenComments.slice() : [];
+                       const index =  hiddenComments.indexOf(id);
+                       if (index === -1) hiddenComments.push(id);
+                       await db.collection('users').updateOne({_id: userId}, {$set: {hiddenComments : hiddenComments}});
+                   }
+               }
+               res.json('160');
+            } catch (err) {
+                console.log(err);
+                res.json('155');
             }
         })();
     });

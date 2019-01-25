@@ -38,7 +38,7 @@ class Index extends React.Component {
     };
     verifyAuthentication() {
         fetch('/verifyAuthentication', {
-            method: 'GET',
+            method: 'POST',
             headers:{
                 'Content-Type': 'application/json; charset=utf-8',
             },

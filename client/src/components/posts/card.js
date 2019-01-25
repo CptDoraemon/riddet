@@ -127,7 +127,7 @@ class Card extends React.Component {
 
                             { isEditable ? <Edit size={buttonSize} className='card-body-bottombar-item' icon={true} type='post' id={postId}/> : null }
 
-                            <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize} id={postId}/>
+                            <HideAndReport className='card-body-bottombar-item' handleHide={this.handleHide} handleReport={this.handleReport} size={buttonSize} id={postId} type='post'/>
 
                         </div>
                     </div>

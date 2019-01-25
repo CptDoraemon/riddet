@@ -74,7 +74,7 @@ class Post extends React.Component {
 
                         <Hide className={buttonClassName} size={buttonSize} postId={postId} icon={true} type='post'/>
 
-                        <Report className={buttonClassName} size={buttonSize} icon={true}/>
+                        <Report className={buttonClassName} size={buttonSize} icon={true} id={postId} type='post'/>
 
                     </div>
                 </div>
@@ -171,9 +171,9 @@ class ReplyPost extends React.Component {
 
                             { isEditable ? <Edit size={buttonSize} className={buttonClassName} icon={false} type='comment' id={commentId}/> : null }
 
-                            <Hide className={buttonClassName} size={buttonSize} postId={commentId} icon={false}/>
+                            <Hide className={buttonClassName} size={buttonSize} postId={commentId} icon={false} type='comment'/>
 
-                            <Report className={buttonClassName} size={buttonSize} icon={false}/>
+                            <Report className={buttonClassName} size={buttonSize} icon={false} id={commentId} type='comment'/>
 
                         </div>
                     </div>

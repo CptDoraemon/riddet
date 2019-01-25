@@ -143,7 +143,7 @@ class Compact extends React.Component {
                             <Save className='compact-body-button' isSaved={isSaved} postId={postId} size={buttonSize} icon={true} type='post'/>
                             { isEditable ? <Edit size={buttonSize} className='compact-body-button' icon={true} type='post' id={postId}/> : null }
                             <Hide className='compact-body-button' size={buttonSize} postId={postId} type='post' icon={true}/>
-                            <Report className='compact-body-button' size={buttonSize} icon={true}/>
+                            <Report className='compact-body-button' size={buttonSize} icon={true} id={postId} type='post'/>
                         </div>
                 }
 
