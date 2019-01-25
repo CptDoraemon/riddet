@@ -57,7 +57,6 @@ class CommentTemplate extends React.Component {
         this.state = {
             postData: null,
             commentArray: null,
-            noMoreComment: false,
         };
         this.postId = this.props.match.params.postId;
         this.isLoadingComment = false;
@@ -76,8 +75,9 @@ class CommentTemplate extends React.Component {
             this.loadMoreComments()
         }
     }
-    loadMoreComments(commentArray = this.state.commentArray.slice()) {
+    loadMoreComments() {
         if (this.noMoreComment || this.isLoadingComment) return;
+        let commentArray = this.state.commentArray.slice();
         this.isLoadingComment = true;
 
         const start = this.lastCommentOrder + 1;
@@ -129,17 +129,21 @@ class CommentTemplate extends React.Component {
             .then(res => res.json())
             .then(json => {
                 let flatten;
+                let comments = [];
                 if (json.comments) {
-                    flatten= flattenArray(json.comments);
+                    if (json.comments.length) comments = json.comments.slice();
+                }
+                if (comments.length) {
+                    flatten= flattenArray(comments);
                 }
                 this.commentArrayFlatten = flatten;
                 // If this post has no comments, set this.noMoreComment
-                if (!json.comments) {
+                if (!comments.length) {
                     this.noMoreComment = true;
                 }
-                this.setState({postData: json, commentArray: json.comments});
-                // load comment
-                this.loadMoreComments(json.comments);
+                this.setState({postData: json, commentArray: comments},
+                    // load comment
+                    this.loadMoreComments);
             })
             .catch((err) => {
                 console.log(err);

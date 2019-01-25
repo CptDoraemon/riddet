@@ -18,14 +18,12 @@ class IFrameL extends React.Component{
         } else if (url === 'about:blank') {
 
         } else {
-            this.setState({isWorking: true});
+            if (!this.state.isWorking) this.setState({isWorking: true});
             document.body.style.overflow = 'hidden';
         }
     }
     close() {
-        this.setState({
-            isWorking: false
-        });
+        if (this.state.isWorking) this.setState({isWorking: false});
         document.body.style.overflow = 'auto';
     }
     preventClose(e) {

@@ -317,7 +317,6 @@ class CommentClickable extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
     handleClick(e) {
-        e.preventDefault();
         window.open('/comment/' + this.props.postId, 'iframe-l');
         this.props.setIFrameLTitle(this.props.postTitle);
     }
