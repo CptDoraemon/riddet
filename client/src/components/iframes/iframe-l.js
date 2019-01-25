@@ -23,6 +23,7 @@ class IFrameL extends React.Component{
         }
     }
     close() {
+        document.getElementById("iframe-s").contentWindow.location.href = 'about:blank';
         if (this.state.isWorking) this.setState({isWorking: false});
         document.body.style.overflow = 'auto';
     }

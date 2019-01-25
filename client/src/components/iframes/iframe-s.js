@@ -23,6 +23,7 @@ class IFrameS extends React.Component{
         }
     }
     close() {
+        document.getElementById("iframe-s").contentWindow.location.href = 'about:blank';
         this.setState({
             isWorking: false
         });
