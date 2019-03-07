@@ -237,30 +237,15 @@ class Banner3 extends React.Component{
         };
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.closeDropdown = this.closeDropdown.bind(this);
-        this.hot = () => {
-            return (
-                <div className='banner3-sort-item flex-row-even' style={this.props.sort === 'hot' ? {color: this.props.themeColor[0]} : null}>
-                    <MdWhatshot />
-                    <span>HOT</span>
-                </div>
-            )
-        };
-        this.new = () => {
-            return (
-                <div className='banner3-sort-item flex-row-even' style={this.props.sort === 'new' ? {color: this.props.themeColor[0]} : null}>
-                    <MdNewReleases />
-                    <span>New</span>
-                </div>
-            )
-        };
-        this.top = () => {
-            return (
-                <div className='banner3-sort-item flex-row-even' style={this.props.sort === 'top' ? {color: this.props.themeColor[0]} : null}>
-                    <IoIosStats />
-                    <span>TOP</span>
-                </div>
-            )
-        }
+    }
+    generateSortDropdownItems(sortByString, iconEl) {
+        const text = sortByString.toUpperCase();
+        return (
+            <div className='banner3-sort-item flex-row-even' style={this.props.sort === sortByString ? {color: this.props.themeColor[0]} : null}>
+                { iconEl }
+                <span> { text } </span>
+            </div>
+        )
     }
     toggleDropdown(e) {
         e.stopPropagation();
@@ -286,8 +271,9 @@ class Banner3 extends React.Component{
         window.removeEventListener('click', this.closeDropdown);
     }
     render() {
-        let sort = this.props.sort === 'hot' ?
-            this.hot() : this.props.sort === 'new' ? this.new() : this.top();
+        const sortByHotItem = this.generateSortDropdownItems('hot', <MdWhatshot />);
+        const sortByNewItem = this.generateSortDropdownItems('new', <MdNewReleases />);
+        const sortByTopItem = this.generateSortDropdownItems('top', <IoIosStats />);
         const handlers = {
             onMouseEnter: (e) => this.handleSortEnter(e),
             onMouseLeave: (e) => this.handleSortLeave(e),
@@ -316,18 +302,24 @@ class Banner3 extends React.Component{
                     <div className='banner3-sort flex-row-even pointer' onClick={this.toggleDropdown}>
                         <span>SORT</span>
                         <div>
-                            { sort }
+                            {
+                                this.props.sort === 'hot'
+                                    ? sortByHotItem
+                                    : this.props.sort === 'new'
+                                    ? sortByNewItem
+                                    : sortByTopItem
+                            }
                         </div>
                         <IoMdArrowDropdown size='20px'/>
                         <div className={this.state.sortDropdown ? 'banner3-sort-dropdown-active' : 'banner3-sort-dropdown-inactive'}>
                             <div className='banner3-sort-dropdown-item pointer' onClick={() => this.props.toggleSort('hot')} {...handlers}>
-                                { this.hot() }
+                                { sortByHotItem }
                             </div>
                             <div className='banner3-sort-dropdown-item pointer' onClick={() => this.props.toggleSort('new')} {...handlers}>
-                                { this.new() }
+                                { sortByNewItem }
                             </div>
                             <div className='banner3-sort-dropdown-item pointer' onClick={() => this.props.toggleSort('top')} {...handlers}>
-                                { this.top() }
+                                { sortByTopItem }
                             </div>
                         </div>
                     </div>

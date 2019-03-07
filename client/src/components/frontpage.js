@@ -39,8 +39,8 @@ class Frontpage extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            view: 'card',
-            sort: 'new',
+            view: null,
+            sort: null,
             loadingPost: false,
             loadingPostSuccess: true,
             postData: [],
@@ -51,13 +51,16 @@ class Frontpage extends React.Component {
         this.toggleSort = this.toggleSort.bind(this);
         this.loadMore = this.loadMore.bind(this);
         this.requestPosts = this.requestPosts.bind(this);
+        this.getLocalStorage = this.getLocalStorage.bind(this);
     }
     toggleView (e) {
+        localStorage.setItem('view', e);
         this.setState({
             view: e
         })
     }
     toggleSort(sortType) {
+        localStorage.setItem('sort', sortType);
         this.setState({
             sort: sortType,
             postData: [],
@@ -120,9 +123,19 @@ class Frontpage extends React.Component {
             this.requestPosts()
         }
     }
+    getLocalStorage() {
+        let sort = localStorage.getItem('sort');
+        let view = localStorage.getItem('view');
+        if (sort === null) sort = 'new';
+        if (view === null) view = 'card';
+        this.setState({
+            sort: sort,
+            view: view
+        }, this.requestPosts)
+    }
     componentDidMount() {
+        this.getLocalStorage();
         this.props.verifyAuthentication();
-        this.requestPosts();
         window.addEventListener('scroll', this.loadMore);
     }
     componentWillUnmount() {
