@@ -192,6 +192,31 @@ module.exports = function (app, db) {
 
     );
 
+    app.post('/search', (req, res, next) => {
+        req.isAuthenticated();
+        next()
+    }, (req, res) => {
+        const query = req.body.key;
+        (async function() {
+            try {
+                await db.collection('posts').createIndex({ post: 'text', title: 'text' });
+                let data = await db.collection('posts').find(
+                    { $text: { $search: query, $caseSensitive: false } }
+                )
+                    .project({ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } } ).toArray();
+
+                if (req.user) {
+                    data = addUserSpecificData(data, req.user);
+                }
+
+                res.json(data);
+            } catch(err) {
+                console.log(err)
+            }
+        })();
+    });
+
     function addUserSpecificData(postArray, userObj) {
         // if logged in
         // add isUpVoted isDownVoted, isSaved, isEditable

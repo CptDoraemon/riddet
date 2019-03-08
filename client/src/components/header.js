@@ -34,12 +34,15 @@ class HeaderFixedSearch extends React.Component{
     constructor (props) {
         super (props);
         this.state = {
-           value: ''
+            value: '',
+            isFocused: false
+
         };
         this.defaultValue = '... search ' + this.props.themeTitle;
         this.handleChange = this.handleChange.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.handleFocus = this.handleFocus.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleChange (e) {
         this.setState({
@@ -48,23 +51,42 @@ class HeaderFixedSearch extends React.Component{
     }
     handleFocus (e) {
         this.setState({
-            value: this.state.value === this.defaultValue ? '' : e.target.value
+            value: this.state.value === this.defaultValue ? '' : e.target.value,
+            isFocused: true
         })
     }
     handleBlur (e) {
         this.setState({
-            value: (/^\s*$/).test(this.state.value) ? this.defaultValue : e.target.value
+            value: (/^\s*$/).test(this.state.value) ? this.defaultValue : e.target.value,
+            isFocused: false
         })
+    }
+    handleSubmit(e) {
+        if (e.key === 'Enter') {
+            if (this.state.isFocused && this.state.value !== this.defaultValue && this.state.value !== '') {
+                window.location.href = '/search?key=' + this.state.value;
+            }
+        } else if (e.type === 'click') {
+            if (this.state.value !== this.defaultValue && this.state.value !== '') {
+                window.location.href = '/search?key=' + this.state.value;
+            }
+        }
     }
     componentDidMount() {
         this.setState({
-            value: this.defaultValue
-        })
+            value: !this.props.searchPreFill ? this.defaultValue : this.props.searchPreFill
+        });
+        document.addEventListener('keydown', this.handleSubmit)
+    }
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleSubmit)
     }
     render () {
         return (
             <div className='header-fixed-search flex-row-even'>
-                <IoIosSearch size='20px'/>
+                <div className='header-fixed-search-icon' onClick={this.handleSubmit}>
+                    <IoIosSearch size='20px'/>
+                </div>
                 <input value={this.state.value} onChange={this.handleChange} onBlur={this.handleBlur} onFocus={this.handleFocus}/>
             </div>
         )
@@ -185,7 +207,7 @@ class HeaderFixed extends React.Component {
             <div className='header-fixed flex-row-even'>
                     <HeaderFixedLogo text={true}/>
                     <HeaderFixedSubs themeLogo={this.props.themeLogo} themeTitle={this.props.themeTitle}/>
-                    <HeaderFixedSearch themeTitle={this.props.themeTitle}/>
+                    <HeaderFixedSearch themeTitle={this.props.themeTitle} searchPreFill={this.props.searchPreFill}/>
                     {/*<HeaderFixedTools />*/}
                     { signup }
                     <HeaderFixedUser isLogin={this.props.isLogin} user={this.props.user}/>
