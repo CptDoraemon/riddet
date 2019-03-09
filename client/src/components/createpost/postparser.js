@@ -29,24 +29,55 @@
 
 
 import React from 'react';
+import './postparser.css';
 
 class PostParser extends React.Component {
     render () {
-        let post = JSON.stringify(this.props.post);
-        post = !post ? '' : post;
-        post = post.slice(1, post.length - 1);
-        post = post.split('\\n');
-        const posts = post.map((i) => <p> {i} </p>);
+        let postString = JSON.stringify(this.props.post);
+        postString = !postString ? '' : postString;
+        postString = postString.slice(1, postString.length - 1);
+
+        let paragraphArray = postString.split('\\n');
+
+        paragraphArray = processParagraph(paragraphArray, /\*\*/, '<b>', '</b>');
+        paragraphArray = processParagraph(paragraphArray, /\*/, '<i>', '</i>');
+        paragraphArray = processParagraph(paragraphArray, />!|!</, '<span class="postparser-spoiler" onClick="(()=>{this.className=\'postparser-spoiler-revealed\'})()">', '</span>');
+        paragraphArray = processParagraph(paragraphArray, /~~/, '<span class="postparser-strikethrough">', '</span>');
+        //
+        paragraphArray = paragraphArray.map(p => {
+            return '<p>' + p + '</p>'
+        });
+
+
+        const processedString = paragraphArray.join('');
+        const innerHtml = {__html: processedString};
+
+
         return (
-            <React.Fragment>
-                { posts }
-            </React.Fragment>
-        )
+            <div dangerouslySetInnerHTML={innerHtml}>
+            </div>
+        );
+
+
+        function processParagraph(array, dividerRegEx,tagStartString, tagCloseString) {
+            return array.map(p => {
+                let fragmentsArray = p.split(dividerRegEx);
+                if (fragmentsArray.length === 1) {
+                    return fragmentsArray[0];
+                } else {
+                    fragmentsArray = fragmentsArray.map((i, index) => {
+                        if (index % 2 === 1) {
+                            return tagStartString + i + tagCloseString;
+                        } else {
+                            return i
+                        }
+                    });
+                    return fragmentsArray.join('');
+                }
+            });
+        }
     }
 }
 
 export { PostParser };
 
-
-//node.className = 'postparser-spoiler';
-//node.onclick = () => {node.className = 'postparser-spoiler-revealed'}

@@ -280,7 +280,7 @@ function textEditorHOC (submitHandler,
             preview.style.height = setHeight + 'px';
         }
         toggleButton(buttonName) {
-            let toggleButton = () => {
+            return () => {
                 let el = document.getElementById('tePost');
                 let start = el.selectionStart;
                 let end = el.selectionEnd;
@@ -366,10 +366,9 @@ function textEditorHOC (submitHandler,
                     });
                 }
             };
-            return toggleButton;
         };
         togglePreview(buttonName) {
-            let togglePreview = () => {
+            return () => {
                 if(buttonName === 'markdown') {
                     !this.state.preview ? this.setState({markdown: !this.state.markdown}) : this.setState({markdown: true, preview: false});
                 }
@@ -377,7 +376,6 @@ function textEditorHOC (submitHandler,
                     !this.state.markdown ? this.setState({preview: !this.state.preview}) : this.setState({preview: true, markdown: false});
                 }
             };
-            return togglePreview;
         };
         shortcutListener(e) {
             let ctrl = (e.ctrlKey || e.metaKey);

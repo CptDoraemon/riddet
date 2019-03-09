@@ -1,5 +1,5 @@
-.postparser-bold {
-     font-weight: bold;
+.postparser-strikethrough {
+     text-decoration: line-through;
  }
 .postparser-spoiler {
     background-color: rgba(0, 0, 0, 1);

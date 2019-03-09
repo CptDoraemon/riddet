@@ -82,7 +82,7 @@ class Index extends React.Component {
                         <Route path="/editPost/:postOrComment/:id" exact render={(props) => <EditPost {...props} {...authenticationTools} {...themeTools}/> } />
                         <Route path="/comment/:postId" exact render={(props) => <CommentTemplate {...props} {...authenticationTools} {...themeTools}/> } />
                         <Route path="/accountSetting/:userId" exact render={(props) => <AccountSetting {...props} {...authenticationTools} {...themeTools}/> } />
-                        <Route path="/search" render={(props) => <Search {...props} {...authenticationTools} {...themeTools}/> } />
+                        <Route path="/search" render={(props) => <Search isLogin={this.state.isLogin} {...authenticationTools} {...themeTools} {...props}/>} />
                     </Switch>
 
                     <IFrameS />

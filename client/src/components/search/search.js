@@ -50,19 +50,20 @@ class Search extends React.Component {
             });
     }
     componentDidMount() {
-        this.sendSearchRequest()
+        this.sendSearchRequest();
+        this.props.verifyAuthentication();
     }
     render() {
         return (
             <div>
-                <HeaderLite {...this.props} searchPreFill={this.query}/>
+                <HeaderLite {...this.props} searchPreFill={this.query} />
                 <div className='search-wrapper'>
                     <div className='search-message'>
                         <h3>{
                         !this.state.isLoaded
                             ? 'Fetching results from server'
                             : this.state.isError
-                            ? 'Ooops, something unexpected happended. Please reload.'
+                            ? 'Ooops, something unexpected happened. Please reload.'
                             : this.state.data.length === 0
                                 ? 'No match for search: ' + this.query
                                 : 'Search results for: ' + this.query
