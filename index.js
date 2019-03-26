@@ -11,13 +11,13 @@ const app = express();
 
 const uristring = process.env.MONGODB_URI || 'mongodb://test:abcd1234@ds125684.mlab.com:25684/freecodecamp';
 
-// if( process.env.PORT ) {
-//     app.use((req, res, next) => {
-//         if (req.header('X-Forwarded-Proto') === 'https') {
-//         next();
-//     } else res.redirect('https://' + req.hostname + req.url);
-// });
-// }
+if( process.env.PORT ) {
+    app.use((req, res, next) => {
+        if (req.header('X-Forwarded-Proto') === 'https') {
+        next();
+    } else res.redirect('https://' + req.hostname + req.url);
+});
+}
 
 app.use(helmet());
 app.use(express.static(path.join(__dirname, '/client/build')));
