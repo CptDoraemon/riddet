@@ -1,33 +1,3 @@
-
-// let node;
-    // let textnode;
-    // let container  = document.createElement('div');
-    // let array = [];
-    // post = post.slice();
-    //
-    // post = JSON.stringify(post);
-    // post = post.slice(1, post.length - 1);
-    //
-    // // [ character, isBold, isItalic, isStrikethrough, isSpoiler, paragraph# ]
-    // // 1. Break into characters, set paraNum
-    // post = post.split('\\n');
-    // post.map((i) => {
-    //     node = document.createElement('p');
-    //     textnode = document.createTextNode(i);
-    //     node.appendChild(textnode);
-    //     container.appendChild(node);
-    // });
-    // let paraNum = 0;
-    // post.map((i) => {
-    //     let char = i.split('');
-    //     char.map((j) => {
-    //         array.push([j, false, false, false, false, paraNum]);
-    //     });
-    //     paraNum++;
-    // });
-    // 2. Find **
-
-
 import React from 'react';
 import './postparser.css';
 
@@ -43,7 +13,7 @@ class PostParser extends React.Component {
         paragraphArray = processParagraph(paragraphArray, /\*/, 'postparser-italic');
         paragraphArray = processParagraph(paragraphArray, />!|!</, 'postparser-spoiler');
         paragraphArray = processParagraph(paragraphArray, /~~/, 'postparser-strikethrough');
-        //
+        // add onclick handler
         const spoilerArray = document.getElementsByClassName('postparser-spoiler');
         for (let i=0; i<spoilerArray.length; i++) {
             const classNameOld = spoilerArray[i].className;
@@ -72,46 +42,106 @@ class PostParser extends React.Component {
                     // no match
                     return fragmentsArray[0];
                 } else {
-                    let isThereSpanTagNotClosed = true;
-                    let spanTagNotClosed = '';
-                    let spanTagNotClosedClassName = '';
                     // matched
+                    //
+                    let spanCheckOld = {
+                        isHangingClosedHere: false,
+                        spanTagNotClosedClassName: ''
+                    };
+                    let spanCheckNew = {
+                        isHangingClosedHere: false,
+                        spanTagNotClosedClassName: ''
+                    };
                     fragmentsArray = fragmentsArray.map((i, index) => {
-                        // reset
-                        if (!isThereSpanTagNotClosed) {
-                            spanTagNotClosed = '';
-                            spanTagNotClosedClassName = '';
-                        }
                         //
-                        const spanBeginMatchedArray = i.match(/<span.+>/ig);
-                        const spanCloseMatchedArray = i.match(/<\/span>/ig);
-                        if (spanBeginMatchedArray !== null) {
-                            if (spanCloseMatchedArray === null || spanBeginMatchedArray.length !== spanCloseMatchedArray.length) {
-                                spanTagNotClosed = spanBeginMatchedArray[spanBeginMatchedArray.length - 1];
-                                spanTagNotClosedClassName = spanTagNotClosed.match(/class="(.+)"/)[1];
-                                console.log(spanTagNotClosed, spanTagNotClosedClassName)
-                            }
-                        }
-
+                        spanCheckNew = checkSpanInFragment(i);
+                        //
                         if (index % 2 === 1) {
-                            let beginTag = '';
-                            if (spanTagNotClosed.length !== 0) {
-                                // reset
-                                isThereSpanTagNotClosed = false;
-                                //
-                                beginTag = '<span class="' + classNameString + ' ' + spanTagNotClosedClassName + '" ' + '>';
-                                return '</span>' + beginTag + i + '</span>' + spanTagNotClosed;
-                            } else {
-                                beginTag = '<span class="' + classNameString + '">';
-                                return beginTag + i + '</span>';
+                            // this fragment needs to be decorated
+                            let isOverlappedWithOtherSpan = false;
+                            //
+                            if (spanCheckNew.isHangingClosedHere) {
+                                isOverlappedWithOtherSpan = true;
+
+                                const closeTagPosition /* pos of '>' */ = i.match(/<\/span>/).index + 7;
+                                i = '<span class="' + spanCheckOld.spanTagNotClosedClassName + ' ' + classNameString + '">' +
+                                    i.slice(0, closeTagPosition) +
+                                    '</span>' +
+                                    '<span class="' + classNameString + '">' +
+                                    i.slice(closeTagPosition);
                             }
-                        } else {
-                            return i
+                            if (spanCheckNew.spanTagNotClosedClassName.length > 0) {
+                                isOverlappedWithOtherSpan = true;
+
+                                let match, lastMatch;
+                                const regex = /<span.+?>/g;
+                                while ((match = regex.exec(i)) !== null){
+                                    lastMatch = match
+                                }
+                                const beginTagPosition /* pos of '<' */ = lastMatch.index;
+                                const beginTagEndPosition = beginTagPosition + lastMatch[0].length;
+                                i = '<span class="' + classNameString + '">' + i.slice(0, beginTagPosition) + '</span>' +
+                                    '<span class="' + classNameString + ' ' + spanCheckNew.spanTagNotClosedClassName + '">' + i.slice(beginTagEndPosition) + '</span>' +
+                                    '<span class="' + spanCheckNew.spanTagNotClosedClassName + '">'
+                            }
+                            if (!isOverlappedWithOtherSpan) {
+                                i = '<span class="' + classNameString + '">' + i + '</span>';
+                            }
                         }
+                        // prepare for next loop
+                        spanCheckOld = passOnCheckSpan(spanCheckOld, spanCheckNew);
+                        //
+                        return i
                     });
                     return fragmentsArray.join('');
                 }
             });
+        }
+
+        function checkSpanInFragment(string) {
+            let isHangingClosedHere = false;
+            let spanTagNotClosedClassName = '';
+            //
+            const spanMatchedArray = string.match(/<span.+?>|<\/span>/ig); /* +? lazy match */
+            if (spanMatchedArray !== null) {
+                if (spanMatchedArray[0][1] === '/') {
+                    // preceding not closed is closed in this fragment
+                    isHangingClosedHere = true;
+                } else {
+                    isHangingClosedHere = false;
+                }
+                if (spanMatchedArray[spanMatchedArray.length - 1][1] !== '/') {
+                    // a span is not closed in this fragment
+                    spanTagNotClosedClassName = spanMatchedArray[spanMatchedArray.length - 1].match(/class="(.+)"/)[1];
+                }
+            }
+            //
+            return {
+                isHangingClosedHere: isHangingClosedHere,
+                spanTagNotClosedClassName: spanTagNotClosedClassName
+            }
+        }
+
+        function passOnCheckSpan(checkSpanOld, checkSpanNew) {
+            let isHangingClosedHere = false;
+            let spanTagNotClosedClassName = '';
+            // hanging closed
+            if (checkSpanOld.spanTagNotClosedClassName.length > 0 && checkSpanNew.isHangingClosedHere) {
+                spanTagNotClosedClassName = '';
+            }
+            // hanging not closed
+            if (checkSpanOld.spanTagNotClosedClassName.length > 0 && !checkSpanNew.isHangingClosedHere) {
+                spanTagNotClosedClassName = checkSpanOld.spanTagNotClosedClassName;
+            }
+            // new hanging
+            if (checkSpanNew.spanTagNotClosedClassName.length > 0) {
+                spanTagNotClosedClassName = checkSpanNew.spanTagNotClosedClassName;
+            }
+            //
+            return {
+                isHangingClosedHere: isHangingClosedHere,
+                spanTagNotClosedClassName: spanTagNotClosedClassName
+            }
         }
     }
 }
