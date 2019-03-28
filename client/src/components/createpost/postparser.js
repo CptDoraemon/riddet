@@ -39,10 +39,16 @@ class PostParser extends React.Component {
 
         let paragraphArray = postString.split('\\n');
 
-        paragraphArray = processParagraph(paragraphArray, /\*\*/, '<b>', '</b>');
-        paragraphArray = processParagraph(paragraphArray, /\*/, '<i>', '</i>');
-        paragraphArray = processParagraph(paragraphArray, />!|!</, '<span class="postparser-spoiler" onClick="(()=>{this.className=\'postparser-spoiler-revealed\'})()">', '</span>');
-        paragraphArray = processParagraph(paragraphArray, /~~/, '<span class="postparser-strikethrough">', '</span>');
+        paragraphArray = processParagraph(paragraphArray, /\*\*/, 'postparser-bold');
+        paragraphArray = processParagraph(paragraphArray, /\*/, 'postparser-italic');
+        paragraphArray = processParagraph(paragraphArray, />!|!</, 'postparser-spoiler');
+        paragraphArray = processParagraph(paragraphArray, /~~/, 'postparser-strikethrough');
+        //
+        const spoilerArray = document.getElementsByClassName('postparser-spoiler');
+        for (let i=0; i<spoilerArray.length; i++) {
+            const classNameOld = spoilerArray[i].className;
+            spoilerArray[i].setAttribute("onclick", '(() => this.className="' + classNameOld + ' postparser-spoiler-revealed")()');
+        }
         //
         paragraphArray = paragraphArray.map(p => {
             return '<p>' + p + '</p>'
@@ -59,15 +65,46 @@ class PostParser extends React.Component {
         );
 
 
-        function processParagraph(array, dividerRegEx,tagStartString, tagCloseString) {
+        function processParagraph(array, dividerRegEx, classNameString) {
             return array.map(p => {
                 let fragmentsArray = p.split(dividerRegEx);
                 if (fragmentsArray.length === 1) {
+                    // no match
                     return fragmentsArray[0];
                 } else {
+                    let isThereSpanTagNotClosed = true;
+                    let spanTagNotClosed = '';
+                    let spanTagNotClosedClassName = '';
+                    // matched
                     fragmentsArray = fragmentsArray.map((i, index) => {
+                        // reset
+                        if (!isThereSpanTagNotClosed) {
+                            spanTagNotClosed = '';
+                            spanTagNotClosedClassName = '';
+                        }
+                        //
+                        const spanBeginMatchedArray = i.match(/<span.+>/ig);
+                        const spanCloseMatchedArray = i.match(/<\/span>/ig);
+                        if (spanBeginMatchedArray !== null) {
+                            if (spanCloseMatchedArray === null || spanBeginMatchedArray.length !== spanCloseMatchedArray.length) {
+                                spanTagNotClosed = spanBeginMatchedArray[spanBeginMatchedArray.length - 1];
+                                spanTagNotClosedClassName = spanTagNotClosed.match(/class="(.+)"/)[1];
+                                console.log(spanTagNotClosed, spanTagNotClosedClassName)
+                            }
+                        }
+
                         if (index % 2 === 1) {
-                            return tagStartString + i + tagCloseString;
+                            let beginTag = '';
+                            if (spanTagNotClosed.length !== 0) {
+                                // reset
+                                isThereSpanTagNotClosed = false;
+                                //
+                                beginTag = '<span class="' + classNameString + ' ' + spanTagNotClosedClassName + '" ' + '>';
+                                return '</span>' + beginTag + i + '</span>' + spanTagNotClosed;
+                            } else {
+                                beginTag = '<span class="' + classNameString + '">';
+                                return beginTag + i + '</span>';
+                            }
                         } else {
                             return i
                         }

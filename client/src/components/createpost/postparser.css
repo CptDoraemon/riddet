@@ -1,6 +1,12 @@
 .postparser-strikethrough {
      text-decoration: line-through;
  }
+.postparser-bold {
+    font-weight: bold;
+}
+.postparser-italic {
+    font-style: italic;
+}
 .postparser-spoiler {
     background-color: rgba(0, 0, 0, 1);
     color: rgba(0, 0, 0, 0);
@@ -22,7 +28,6 @@
     border-radius: 2px;
 }
 .postparser-spoiler-revealed {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: rgba(0, 0, 0, 1);
-    transition: 0.5s;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    color: rgba(0, 0, 0, 1) !important;
 }
